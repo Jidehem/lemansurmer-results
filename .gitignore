@@ -1,0 +1,7 @@
+/target/
+/.~lock.*#
+/.classpath
+/.project
+/.settings/
+/r*.xlsx
+/r*.xls
