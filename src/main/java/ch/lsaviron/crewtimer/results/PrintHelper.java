@@ -1,4 +1,8 @@
 package ch.lsaviron.crewtimer.results;
+
+import java.util.List;
+import java.util.SortedMap;
+
 /**
  * @author Jean-David Maillefer
  */
@@ -21,4 +25,7 @@ interface PrintHelper {
 		}
 		return "+" + value;
 	}
+
+	List<SubResult> getSubResults(
+			SortedMap<EventCategoryKey, List<CategoryResult>> results);
 }

@@ -50,8 +50,8 @@ public class LSM {
 
 		if (args.length != 2) {
 			System.err.println(
-					"Syntax: java LSM.java results-from-crewtimer.csv [output.xlsx|mode]\n"
-							+ "       where mode is SCREEN or TSV");
+					"Syntax: java LSM.java results-from-crewtimer.csv mode\n"
+							+ "       where mode is SCREEN, TSV, XLS or XLSX");
 			return;
 		}
 		final String resultsFromCrewTimerCsv = args[0];
@@ -143,6 +143,21 @@ public class LSM {
 	private void printResults(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
 		final PrintHelper printHelper = printMode.buildHelper(this);
+		for (final SubResult subResult : printHelper.getSubResults(results)) {
+			subResult.init();
+			final SortedMap<EventCategoryKey, List<CategoryResult>> results2 = subResult
+					.getResults();
+			//System.out.println(results2.size());
+			printResults(results2, printHelper);
+			subResult.end();
+		}
+
+		printHelper.end();
+	}
+
+	private void printResults(
+			final SortedMap<EventCategoryKey, List<CategoryResult>> results,
+			final PrintHelper printHelper) {
 		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : results
 				.entrySet()) {
 			final List<CategoryResult> resCat = entry.getValue();
@@ -171,8 +186,6 @@ public class LSM {
 			}
 			printHelper.printRaceFooter();
 		}
-
-		printHelper.end();
 	}
 
 	private String getStartTime(final String start) {

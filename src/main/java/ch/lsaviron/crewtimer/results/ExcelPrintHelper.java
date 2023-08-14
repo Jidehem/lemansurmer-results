@@ -3,6 +3,13 @@ package ch.lsaviron.crewtimer.results;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -12,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.WorkbookUtil;
 
 /**
  * @author Jean-David Maillefer
@@ -22,7 +30,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	private final Workbook wb;
 
-	private final Sheet sheet;
+	private Sheet sheet;
 
 	int rownum;
 
@@ -39,19 +47,10 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to created workbook", e);
 		}
-		sheet = wb.createSheet("Résultats LSM");
 		final String fontName = "Trebuchet MS";
 		final Font font0 = wb.createFont();
 		font0.setFontName(fontName);
 		wb.getCellStyleAt(0).setFont(font0);
-
-		int col = 0;
-		sheet.setColumnWidth(col++, 1800);
-		sheet.setColumnWidth(col++, 800);
-		sheet.setColumnWidth(col++, 3300);
-		sheet.setColumnWidth(col++, 18000);
-		sheet.setColumnWidth(col++, 3000);
-		sheet.setColumnWidth(col++, 3500);
 
 		final Font font = wb.createFont();
 		font.setFontHeightInPoints((short) 13);
@@ -73,14 +72,28 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		crewCellStyle.setFont(font0);
 		crewCellStyle.setWrapText(true);
 
+	}
+
+	abstract Workbook createWorkbook() throws IOException;
+
+	public void initSheet(final String sheetName) {
+		sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(sheetName));
+		rownum = 0;
+
+		int col = 0;
+		sheet.setColumnWidth(col++, 1800);
+		sheet.setColumnWidth(col++, 800);
+		sheet.setColumnWidth(col++, 3300);
+		sheet.setColumnWidth(col++, 18000);
+		sheet.setColumnWidth(col++, 3000);
+		sheet.setColumnWidth(col++, 3500);
+
 		// print settings
 		final PrintSetup ps = sheet.getPrintSetup();
 		ps.setFitWidth((short) 1);
 
 		//sheet.setDefaultRowHeight((short) 300);
 	}
-
-	abstract Workbook createWorkbook() throws IOException;
 
 	@Override
 	public void printRaceHeader(final String header) {
@@ -139,6 +152,11 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	@Override
 	public void printRaceFooter() {
+		// nothing to do
+	}
+
+	@Override
+	public void end() {
 		try (OutputStream fileOut = new FileOutputStream(outputFile)) {
 			wb.write(fileOut);
 		} catch (final IOException e) {
@@ -146,4 +164,72 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		}
 	}
 
+	@Override
+	public List<SubResult> getSubResults(
+			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
+		return Arrays.asList(new ExcelSubResult("TOUS") {
+
+			@Override
+			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+				return results;
+			}
+
+		}, new ExcelSubResult("Championnat Suisse") {
+
+			@Override
+			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+				return results.entrySet().stream()
+						.filter(e -> e.getKey().isSwissChampionshipCategory())
+						.collect(getCollector(results));
+			}
+
+		}, new ExcelSubResult("LSM hors championnat Suisse") {
+
+			@Override
+			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+				return results.entrySet().stream()
+						.filter(e -> !e.getKey().isSwissChampionshipCategory())
+						.collect(getCollector(results));
+			}
+
+		});
+	}
+
+	private Collector<Entry<EventCategoryKey, List<CategoryResult>>, ?, TreeMap<EventCategoryKey, List<CategoryResult>>> getCollector(
+			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
+		return Collectors.toMap(
+				Entry<EventCategoryKey, List<CategoryResult>>::getKey,
+				Entry<EventCategoryKey, List<CategoryResult>>::getValue,
+				(a, b) -> {
+					throw new IllegalArgumentException(String.format(
+							"Should not happen since already unique a: %s, b: %s"));
+				},
+				() -> new TreeMap<EventCategoryKey, List<CategoryResult>>(
+						results.comparator()));
+	}
+
+	abstract class ExcelSubResult implements SubResult {
+
+		private final String name;
+
+		ExcelSubResult(final String name) {
+			this.name = name;
+		}
+
+		@Override
+		public void init() {
+			initSheet(name);
+		}
+
+		@Override
+		public void end() {
+			// default: nothing to do
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+	}
 }

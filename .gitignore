@@ -3,5 +3,5 @@
 /.classpath
 /.project
 /.settings/
-/r*.xlsx
-/r*.xls
+/src/main/data/*.xls
+/src/main/data/*.xlsx

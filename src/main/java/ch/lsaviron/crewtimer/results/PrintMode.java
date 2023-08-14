@@ -1,7 +1,11 @@
 package ch.lsaviron.crewtimer.results;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedMap;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -44,6 +48,13 @@ enum PrintMode {
 			public void printRaceFooter() {
 				System.out.println();
 			}
+
+			@Override
+			public List<SubResult> getSubResults(
+					final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
+				return Collections
+						.<SubResult>singletonList(new SimpleSubResult(results));
+			}
 		};
 
 		@Override
@@ -85,6 +96,13 @@ enum PrintMode {
 			@Override
 			public void printRaceFooter() {
 				System.out.println();
+			}
+
+			@Override
+			public List<SubResult> getSubResults(
+					final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
+				return Collections
+						.<SubResult>singletonList(new SimpleSubResult(results));
 			}
 		};
 
