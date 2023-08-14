@@ -37,22 +37,6 @@ public class LSM {
 
 	private final PrintMode printMode;
 
-	enum Headers {
-		EventNum,
-		Event,
-		Place,
-		Crew,
-		CrewAbbrev,
-		Bow,
-		Stroke,
-		Start,
-		Finish,
-		RawTime,
-		PenaltyCode,
-		AdjTime,
-		Delta
-	}
-
 	public LSM(final String resultsFromCrewTimerCsv,
 			final PrintMode printMode) {
 		this.resultsFromCrewTimerCsv = resultsFromCrewTimerCsv;
@@ -83,7 +67,8 @@ public class LSM {
 		try (Reader in = new FileReader(resultsFromCrewTimerCsv)) {
 			final CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
 					.setAllowMissingColumnNames(false).setSkipHeaderRecord(true)
-					.setNullString("").setHeader(Headers.class).build();
+					.setNullString("").setHeader(CsvResultHeaders.class)
+					.build();
 			parser = csvFormat.parse(in);
 			//System.out.println(parser.getHeaderNames());
 
@@ -93,22 +78,23 @@ public class LSM {
 			String lastStart = null;
 			for (final CSVRecord record : parser) {
 				//System.out.println(record);
-				String start = record.get(Headers.Start);
+				String start = record.get(CsvResultHeaders.Start);
 				if (start == null) {
 					start = lastStart;
 				} else {
 					lastStart = start;
 				}
 				final var cr = new CategoryResult(
-						Integer.parseInt(record.get(Headers.EventNum)),
-						record.get(Headers.Event),
-						Optional.ofNullable(record.get(Headers.Place))
+						Integer.parseInt(record.get(CsvResultHeaders.EventNum)),
+						record.get(CsvResultHeaders.Event),
+						Optional.ofNullable(record.get(CsvResultHeaders.Place))
 								.map(Integer::parseInt).orElse(null),
-						record.get(Headers.Crew),
-						record.get(Headers.CrewAbbrev),
-						record.get(Headers.Stroke), start,
-						record.get(Headers.Finish), record.get(Headers.Delta),
-						record.get(Headers.AdjTime));
+						record.get(CsvResultHeaders.Crew),
+						record.get(CsvResultHeaders.CrewAbbrev),
+						record.get(CsvResultHeaders.Stroke), start,
+						record.get(CsvResultHeaders.Finish),
+						record.get(CsvResultHeaders.Delta),
+						record.get(CsvResultHeaders.AdjTime));
 				results.computeIfAbsent(cr.getEventCategory(),
 						k -> new ArrayList<>()).add(cr);
 			}
@@ -167,8 +153,8 @@ public class LSM {
 			if (res.isSwissChampionshipCategory()) {
 				extraSwissChampionship = " 🏆🇨🇭";
 			}
-			printHelper.printRaceHeader(res.toStandardCategory().category
-					+ extraSwissChampionship + " (course " + res.event + ", "
+			printHelper.printRaceHeader(res.toStandardCategory().category()
+					+ extraSwissChampionship + " (course " + res.event() + ", "
 					+ getStartTime(resCat.get(0).start) + ")");
 
 			// race results
@@ -247,28 +233,6 @@ public class LSM {
 		}
 		// LSM
 		return Math.min(Math.max(0, nbParticipants - 1), 3);
-	}
-
-	record EventCategoryKey(int event, String category)
-			implements Comparable<EventCategoryKey> {
-
-		@Override
-		public int compareTo(final EventCategoryKey o) {
-			return Comparator.comparingInt(EventCategoryKey::event)
-					.thenComparing(EventCategoryKey::category).compare(this, o);
-		}
-
-		public EventCategoryKey toStandardCategory() {
-			if (!isSwissChampionshipCategory()) {
-				return this;
-			}
-			return new EventCategoryKey(event,
-					category.substring(0, category.length() - 1));
-		}
-
-		final boolean isSwissChampionshipCategory() {
-			return LSM.isSwissChampionship(category);
-		}
 	}
 
 	static final boolean isSwissChampionship(final String category) {

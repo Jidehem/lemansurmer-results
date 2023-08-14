@@ -2,8 +2,6 @@ package ch.lsaviron.crewtimer.results;
 
 import java.util.Comparator;
 
-import ch.lsaviron.crewtimer.results.LSM.EventCategoryKey;
-
 class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 
 	final int event;
@@ -29,10 +27,9 @@ class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 	final String adjTime;
 
 	CategoryResult(final int event, final String eventName,
-			final Integer eventRank, final String crew,
-			final String crewAbbrev, final String category,
-			final String start, final String finish, final String delta,
-			final String adjTime) {
+			final Integer eventRank, final String crew, final String crewAbbrev,
+			final String category, final String start, final String finish,
+			final String delta, final String adjTime) {
 		this.event = event;
 		this.eventName = eventName;
 		this.eventRank = eventRank;
@@ -59,8 +56,7 @@ class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 
 	@Override
 	public int compareTo(final CategoryResult o) {
-		return Comparator
-				.comparingInt((final CategoryResult cr) -> cr.event)
+		return Comparator.comparingInt((final CategoryResult cr) -> cr.event)
 				.thenComparing(cr -> cr.category)
 				.thenComparing(Comparator.comparing(
 						(final CategoryResult cr) -> cr.eventRank,
