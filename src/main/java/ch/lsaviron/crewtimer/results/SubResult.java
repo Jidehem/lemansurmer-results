@@ -9,8 +9,6 @@ public interface SubResult {
 
 	void end();
 
-	String getName();
-
 	SortedMap<EventCategoryKey, List<CategoryResult>> getResults();
 
 }

@@ -2,12 +2,16 @@ package ch.lsaviron.crewtimer.results;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collector;
@@ -52,6 +56,8 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	private final CellStyle crewCellStyle;
 
 	private EnumMap<Logo, Integer> logoIdx;
+
+	private final Properties messages;
 
 	enum Logo {
 
@@ -109,6 +115,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		crewCellStyle.setFont(font0);
 		crewCellStyle.setWrapText(true);
 
+		messages = loadMessages();
 	}
 
 	private void initImages() {
@@ -121,7 +128,9 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	abstract Workbook createWorkbook() throws IOException;
 
-	public void initSheet(final String sheetName, final String header) {
+	public void initSheet(final String keyPrefix) {
+		final String sheetName = getMessageSafe(
+				"tab." + keyPrefix + ".tabName");
 		sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(sheetName));
 		rownum = 0;
 
@@ -139,7 +148,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 		//sheet.setDefaultRowHeight((short) 300);
 
-		initHeader(header);
+		initHeader(keyPrefix);
 	}
 
 	public static int cmToEmu(final double distanceInCm) {
@@ -188,7 +197,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		// we could maybe repeat first lines on each page
 	}
 
-	private void initHeader(final String header) {
+	private void initHeader(final String keyPrefix) {
 		// TODO: this is too complex. Check if simpler to use a template instead (but need to have a template for both XLS and XLSX ?)
 		Row row = sheet.createRow(rownum);
 		Cell cell = row.createCell(0);
@@ -199,7 +208,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		font.setFontHeightInPoints((short) 22);
 		cellStyle.setFont(font);
 		cell.setCellStyle(cellStyle);
-		cell.setCellValue("Léman-sur-mer");
+		cell.setCellValue(getMessageSafe("title.main"));
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
 		rownum++;
 
@@ -214,7 +223,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		font.setFontHeightInPoints((short) 16);
 		cellStyle.setFont(font);
 		cell.setCellStyle(cellStyle);
-		cell.setCellValue("Deuxième Championnats suisses d'aviron de mer");
+		cell.setCellValue(getMessageSafe("title.detail"));
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
 		rownum++;
 
@@ -226,7 +235,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		font.setFontHeightInPoints((short) 16);
 		cellStyle.setFont(font);
 		cell.setCellStyle(cellStyle);
-		cell.setCellValue("Samedi 14 octobre 2023");
+		cell.setCellValue(getMessageSafe("title.date"));
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
 		rownum++;
 
@@ -239,13 +248,20 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		font.setFontHeightInPoints((short) 13);
 		cellStyle.setFont(font);
 		cell.setCellStyle(cellStyle);
-		cell.setCellValue(header);
+		cell.setCellValue(getMessageSafe("tab." + keyPrefix + ".title"));
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
 		rownum++;
 
 		row = sheet.createRow(rownum);
 		row.setHeightInPoints(15);
 		rownum++;
+	}
+
+	private String getMessageSafe(final String key) {
+		if (!messages.containsKey(key)) {
+			throw new RuntimeException("No message found for key " + key);
+		}
+		return messages.getProperty(key);
 	}
 
 	private Font createFontForHeader() {
@@ -255,13 +271,25 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	}
 
 	private byte[] loadImage(final String image) {
-		System.getProperty("java.class.path");
 		try {
 			return IOUtils.toByteArray(ExcelPrintHelper.class.getClassLoader()
 					.getResourceAsStream("images/" + image));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load image " + image, e);
 		}
+	}
+
+	private Properties loadMessages() {
+		final Properties res = new Properties();
+		try (InputStream is = ExcelPrintHelper.class.getClassLoader()
+				.getResourceAsStream("excel_messages.properties");
+				InputStreamReader isr = new InputStreamReader(is,
+						StandardCharsets.UTF_8)) {
+			res.load(isr);
+		} catch (final IOException e) {
+			throw new RuntimeException("Failed to load Excel messages", e);
+		}
+		return res;
 	}
 
 	@Override
@@ -336,9 +364,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	@Override
 	public List<SubResult> getSubResults(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
-		// TODO rendre les labels configurables/lire depuis un fichier .properties
-		return Arrays.asList(new ExcelSubResult("Championnat Suisse",
-				"Résultats des Championnats suisses d'aviron de mer", true) {
+		return Arrays.asList(new ExcelSubResult("swissChampionship", true) {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
@@ -347,27 +373,23 @@ abstract class ExcelPrintHelper implements PrintHelper {
 						.collect(getCollector(results));
 			}
 
-		},
-				new ExcelSubResult("LSM hors championnat Suisse",
-						"Résultats de Lausanne sur mer", false) {
+		}, new ExcelSubResult("lsm", false) {
 
-					@Override
-					public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-						return results.entrySet().stream().filter(
-								e -> !e.getKey().isSwissChampionshipCategory())
-								.collect(getCollector(results));
-					}
+			@Override
+			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+				return results.entrySet().stream()
+						.filter(e -> !e.getKey().isSwissChampionshipCategory())
+						.collect(getCollector(results));
+			}
 
-				},
-				new ExcelSubResult("TOUS", "Résultats de toutes les courses",
-						false) {
+		}, new ExcelSubResult("all", false) {
 
-					@Override
-					public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-						return results;
-					}
+			@Override
+			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+				return results;
+			}
 
-				});
+		});
 	}
 
 	private Collector<Entry<EventCategoryKey, List<CategoryResult>>, ?, TreeMap<EventCategoryKey, List<CategoryResult>>> getCollector(
@@ -385,33 +407,25 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	abstract class ExcelSubResult implements SubResult {
 
-		private final String name;
-
-		private final String header;
+		private final String keyPrefix;
 
 		private final boolean useSwissRowingLogo;
 
-		ExcelSubResult(final String name, final String header,
+		ExcelSubResult(final String keyPrefix,
 				final boolean useSwissRowingLogo) {
-			this.name = name;
-			this.header = header;
+			this.keyPrefix = keyPrefix;
 			this.useSwissRowingLogo = useSwissRowingLogo;
 		}
 
 		@Override
 		public void init() {
-			initSheet(name, header);
+			initSheet(keyPrefix);
 		}
 
 		@Override
 		public void end() {
 			// default: nothing to do
 			endSheet(useSwissRowingLogo);
-		}
-
-		@Override
-		public String getName() {
-			return name;
 		}
 
 	}

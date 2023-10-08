@@ -18,11 +18,6 @@ record SimpleSubResult(
 	}
 
 	@Override
-	public String getName() {
-		return "TOUS";
-	}
-
-	@Override
 	public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
 		return results;
 	}
