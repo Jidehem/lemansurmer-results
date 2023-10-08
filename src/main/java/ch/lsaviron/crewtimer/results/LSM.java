@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -197,7 +198,7 @@ public class LSM {
 			if (res.isSwissChampionshipCategory()) {
 				extraSwissChampionship = " 🏆🇨🇭";
 			}
-			printHelper.printRaceHeader(res.toStandardCategory().category()
+			printHelper.printRaceHeader(res.toStandardCategory()
 					+ extraSwissChampionship + " (course " + res.event() + ", "
 					+ getStartTime(resCat.get(0).start) + ")");
 
@@ -229,25 +230,40 @@ public class LSM {
 		return RACE_TIME_FORMATTER.format(time);
 	}
 
+	// duplicate/merge some special categories to have correct result
 	private void mergeSpecialCategories(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
 		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : results
 				.entrySet()) {
 			final EventCategoryKey eventCategoryKey = entry.getKey();
+			// FIXME handle Warning: no standard category found for EventCategoryKey[event=🐟 D.15, category=Mix C2x*]
 			if (eventCategoryKey.isSwissChampionshipCategory()) {
 				// add it to the corresponding non-swiss championship category
-				final List<CategoryResult> standardRes = results
-						.get(eventCategoryKey.toStandardCategory());
-				if (standardRes == null) {
+				final String standardCategory = eventCategoryKey
+						.toStandardCategory();
+				final List<List<CategoryResult>> standardRes = results
+						.entrySet().stream().filter(e -> {
+							final EventCategoryKey key = e.getKey();
+							return standardCategory.equals(key.category())
+									&& Objects.equals(
+											eventCategoryKey.event().letter(),
+											key.event().letter());
+						}).map(e -> e.getValue()).toList();
+				if (standardRes.isEmpty()) {
 					System.out
 							.println("Warning: no standard category found for "
 									+ eventCategoryKey);
+				} else if (standardRes.size() > 1) {
+					throw new RuntimeException("Found " + standardRes.size()
+							+ " results while expecting only one for "
+							+ eventCategoryKey);
 				} else {
 					// we need to (deep-)copy each value since they will be modified
+					final List<CategoryResult> crs = standardRes.get(0);
 					entry.getValue().stream().map(CategoryResult::new)
-							.forEachOrdered(standardRes::add);
-					standardRes
-							.sort(Comparator.comparingInt(cr -> cr.eventRank));
+							.forEachOrdered(crs::add);
+					crs.sort(Comparator.comparing(cr -> cr.eventRank,
+							Comparator.nullsLast(Comparator.naturalOrder())));
 				}
 			}
 		}

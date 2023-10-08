@@ -11,12 +11,11 @@ record EventCategoryKey(EventId event, String category)
 				.thenComparing(EventCategoryKey::category).compare(this, o);
 	}
 
-	public EventCategoryKey toStandardCategory() {
+	public String toStandardCategory() {
 		if (!isSwissChampionshipCategory()) {
-			return this;
+			return category;
 		}
-		return new EventCategoryKey(event,
-				category.substring(0, category.length() - 1));
+		return category.substring(0, category.length() - 1);
 	}
 
 	final boolean isSwissChampionshipCategory() {
