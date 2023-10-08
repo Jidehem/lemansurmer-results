@@ -242,9 +242,11 @@ public class LSM {
 	private static int getNbMedals(final int nbParticipants,
 			final boolean isSwissChampionship) {
 		if (isSwissChampionship) {
+			// 3 medals are given, unless there is not enough participants
 			return Math.min(nbParticipants, 3);
 		}
 		// LSM
+		// 3 medals are given, but the last one must not receive a medal
 		return Math.min(Math.max(0, nbParticipants - 1), 3);
 	}
 
