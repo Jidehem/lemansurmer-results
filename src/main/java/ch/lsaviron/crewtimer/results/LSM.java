@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -84,8 +86,7 @@ public class LSM {
 				} else {
 					lastStart = start;
 				}
-				final var cr = new CategoryResult(
-						Integer.parseInt(record.get(CsvResultHeaders.EventNum)),
+				final var cr = new CategoryResult(extractEventNum(record),
 						record.get(CsvResultHeaders.Event),
 						Optional.ofNullable(record.get(CsvResultHeaders.Place))
 								.map(Integer::parseInt).orElse(null),
@@ -106,6 +107,34 @@ public class LSM {
 
 			printResults(results);
 		}
+	}
+
+	private final static Pattern EVENT_ENUM_PATTERN_23 = Pattern
+			.compile("(.) ([A-Z])");
+
+	private final static Pattern EVENT_ENUM_PATTERN_23_COMBINED = Pattern
+			.compile("(.) ([A-Z])\\.(\\d+)");
+
+	private final static Pattern EVENT_ENUM_PATTERN_22 = Pattern
+			.compile("(\\d+)");
+
+	private EventId extractEventNum(final CSVRecord record) {
+		final String eventNumRaw = record.get(CsvResultHeaders.EventNum);
+		Matcher matcher = EVENT_ENUM_PATTERN_22.matcher(eventNumRaw);
+		if (matcher.matches()) {
+			return new EventId(null, null, Integer.parseInt(matcher.group(1)));
+		}
+		matcher = EVENT_ENUM_PATTERN_23_COMBINED.matcher(eventNumRaw);
+		if (matcher.matches()) {
+			return new EventId(matcher.group(1), matcher.group(2),
+					Integer.parseInt(matcher.group(3)));
+		}
+		matcher = EVENT_ENUM_PATTERN_23.matcher(eventNumRaw);
+		if (matcher.matches()) {
+			return new EventId(matcher.group(1), matcher.group(2), null);
+		}
+		throw new RuntimeException(
+				"Failed to detect pattern for eventId " + eventNumRaw);
 	}
 
 	private void fixRankAndDelta(

@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 
-	final int event;
+	final EventId event;
 
 	final String eventName;
 
@@ -26,7 +26,7 @@ class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 
 	final String adjTime;
 
-	CategoryResult(final int event, final String eventName,
+	CategoryResult(final EventId event, final String eventName,
 			final Integer eventRank, final String crew, final String crewAbbrev,
 			final String category, final String start, final String finish,
 			final String delta, final String adjTime) {
@@ -56,7 +56,9 @@ class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 
 	@Override
 	public int compareTo(final CategoryResult o) {
-		return Comparator.comparingInt((final CategoryResult cr) -> cr.event)
+		return Comparator
+				.comparing((final CategoryResult cr) -> cr.event,
+						EventId.COMPARATOR)
 				.thenComparing(cr -> cr.category)
 				.thenComparing(Comparator.comparing(
 						(final CategoryResult cr) -> cr.eventRank,
