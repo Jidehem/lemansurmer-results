@@ -4,7 +4,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -13,18 +15,27 @@ import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.ClientAnchor.AnchorType;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
+import org.apache.poi.util.IOUtils;
 
 /**
  * @author Jean-David Maillefer
  */
 abstract class ExcelPrintHelper implements PrintHelper {
+
+	private static final String DEFAULT_FONT_NAME = "Trebuchet MS";
 
 	private final String outputFile;
 
@@ -40,6 +51,30 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	private final CellStyle crewCellStyle;
 
+	private EnumMap<Logo, Integer> logoIdx;
+
+	enum Logo {
+
+		LEMAN_SUR_MER("logo-lemansurmer.jpg"),
+		SWISS_ROWING("logo-swissrowing.png");
+
+		String filename;
+
+		private Logo(final String filename) {
+			this.filename = filename;
+		}
+
+		public int getPictureType() {
+			if (filename.toLowerCase(Locale.ENGLISH).endsWith(".png")) {
+				return Workbook.PICTURE_TYPE_PNG;
+			}
+			if (filename.toLowerCase(Locale.ENGLISH).endsWith(".jpg")) {
+				return Workbook.PICTURE_TYPE_JPEG;
+			}
+			throw new RuntimeException("Unknown file type for " + filename);
+		}
+	}
+
 	public ExcelPrintHelper(final String outputFile) {
 		this.outputFile = outputFile;
 		try {
@@ -47,14 +82,16 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to created workbook", e);
 		}
-		final String fontName = "Trebuchet MS";
+
+		initImages();
+
 		final Font font0 = wb.createFont();
-		font0.setFontName(fontName);
+		font0.setFontName(DEFAULT_FONT_NAME);
 		wb.getCellStyleAt(0).setFont(font0);
 
 		final Font font = wb.createFont();
 		font.setFontHeightInPoints((short) 13);
-		font.setFontName(fontName);
+		font.setFontName(DEFAULT_FONT_NAME);
 		font.setItalic(true);
 
 		resultHeaderStyle = wb.createCellStyle();
@@ -62,7 +99,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 		final Font font2 = wb.createFont();
 		font2.setFontHeightInPoints((short) 18);
-		font2.setFontName(fontName);
+		font2.setFontName(DEFAULT_FONT_NAME);
 		font2.setBold(true);
 
 		raceHeaderStyle = wb.createCellStyle();
@@ -72,6 +109,14 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		crewCellStyle.setFont(font0);
 		crewCellStyle.setWrapText(true);
 
+	}
+
+	private void initImages() {
+		logoIdx = new EnumMap<>(Logo.class);
+		for (final Logo logo : Logo.values()) {
+			final byte[] bytes = loadImage(logo.filename);
+			logoIdx.put(logo, wb.addPicture(bytes, logo.getPictureType()));
+		}
 	}
 
 	abstract Workbook createWorkbook() throws IOException;
@@ -93,6 +138,123 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		ps.setFitWidth((short) 1);
 
 		//sheet.setDefaultRowHeight((short) 300);
+
+		initHeader();
+	}
+
+	public void endSheet() {
+		final CreationHelper helper = wb.getCreationHelper();
+		// Create the drawing patriarch.  This is the top level container for all shapes.
+		final Drawing<?> drawing = sheet.createDrawingPatriarch();
+		// images must be after other sizing in the page to avoid some silly resizing effects
+		{
+			final ClientAnchor anchor = helper.createClientAnchor();
+			anchor.setAnchorType(AnchorType.MOVE_DONT_RESIZE);
+//			template pos: .36cm x; .15cm y
+//			template size: 2.65L; 2.38H (A1)
+			// set top-left corner of the picture,
+//			anchor.setCol1(1);
+//			anchor.setRow1(1);
+//			anchor.setCol2(3);
+//			anchor.setRow2(1);
+			anchor.setDx1(200);
+			anchor.setDy1(0);
+			anchor.setDx2(1000);
+			anchor.setDy2(1000);
+			final Picture pict = drawing.createPicture(anchor,
+					logoIdx.get(Logo.LEMAN_SUR_MER));
+			pict.resize();
+		}
+		{
+//			template pos: 2.69cm x; 0cm y
+//			template size: 1.88L; 2.26H (B1)
+			final ClientAnchor anchor = helper.createClientAnchor();
+			anchor.setAnchorType(AnchorType.MOVE_DONT_RESIZE);
+			// set top-left corner of the picture,
+			anchor.setCol1(0);
+			anchor.setRow1(0);
+			//anchor.setDy1(900);
+			final Picture pict = drawing.createPicture(anchor,
+					logoIdx.get(Logo.SWISS_ROWING));
+			pict.resize();
+		}
+	}
+
+	private void initHeader() {
+
+		Row row = sheet.createRow(rownum);
+		Cell cell = row.createCell(0);
+		CellStyle cellStyle = wb.createCellStyle();
+		cellStyle.setAlignment(HorizontalAlignment.CENTER);
+		Font font = createFontForHeader();
+		font.setBold(true);
+		font.setFontHeightInPoints((short) 22);
+		cellStyle.setFont(font);
+		cell.setCellStyle(cellStyle);
+		cell.setCellValue("Léman-sur-mer");
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
+		rownum++;
+
+		final CellStyle cellStyleTemplate = cellStyle;
+
+		row = sheet.createRow(rownum);
+		cell = row.createCell(0);
+		cellStyle = wb.createCellStyle();
+		cellStyle.cloneStyleFrom(cellStyleTemplate);
+		font = createFontForHeader();
+		font.setBold(true);
+		font.setFontHeightInPoints((short) 16);
+		cellStyle.setFont(font);
+		cell.setCellStyle(cellStyle);
+		cell.setCellValue("Deuxième Championnats suisses d'aviron de mer");
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
+		rownum++;
+
+		row = sheet.createRow(rownum);
+		cell = row.createCell(0);
+		cellStyle = wb.createCellStyle();
+		cellStyle.cloneStyleFrom(cellStyleTemplate);
+		font = createFontForHeader();
+		font.setFontHeightInPoints((short) 16);
+		cellStyle.setFont(font);
+		cell.setCellStyle(cellStyle);
+		cell.setCellValue("Samedi 14 octobre 2023");
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
+		rownum++;
+
+		row = sheet.createRow(rownum);
+		cell = row.createCell(0);
+		cellStyle = wb.createCellStyle();
+		cellStyle.cloneStyleFrom(cellStyleTemplate);
+		font = createFontForHeader();
+		font.setBold(true);
+		font.setFontHeightInPoints((short) 13);
+		cellStyle.setFont(font);
+		cell.setCellStyle(cellStyle);
+		// TODO set/adapt content based on sheet name/index
+		cell.setCellValue("Résultats des Championnats suisses d'aviron de mer");
+		//cell.setCellValue("Résultats par catégorie");
+		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
+		rownum++;
+
+		// TODO make text configurable
+
+	}
+
+	private Font createFontForHeader() {
+		final Font font = wb.createFont();
+		font.setFontName(DEFAULT_FONT_NAME + " Bold Italic");
+		return font;
+	}
+
+	private byte[] loadImage(final String image) {
+		System.getProperty("java.class.path");
+		try {
+			return IOUtils.toByteArray(ExcelPrintHelper.class.getClassLoader()
+					.getResourceAsStream("images/" + image));
+		} catch (final IOException e) {
+			throw new RuntimeException("Failed to load image " + image, e);
+		}
 	}
 
 	@Override
@@ -224,6 +386,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		@Override
 		public void end() {
 			// default: nothing to do
+			endSheet();
 		}
 
 		@Override

@@ -116,8 +116,7 @@ enum PrintMode {
 
 		@Override
 		PrintHelper buildHelper(final LSM lsm) {
-			return new ExcelPrintHelper(
-					buildOutputFile(lsm, ".xls").toString()) {
+			return new ExcelPrintHelper(buildOutputFile(lsm, ".xls").toString()) {
 
 				@Override
 				Workbook createWorkbook() throws IOException {
