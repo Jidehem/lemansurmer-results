@@ -21,7 +21,6 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Picture;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -29,6 +28,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.Units;
 
 /**
  * @author Jean-David Maillefer
@@ -121,7 +121,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	abstract Workbook createWorkbook() throws IOException;
 
-	public void initSheet(final String sheetName) {
+	public void initSheet(final String sheetName, final String header) {
 		sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(sheetName));
 		rownum = 0;
 
@@ -139,49 +139,57 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 		//sheet.setDefaultRowHeight((short) 300);
 
-		initHeader();
+		initHeader(header);
 	}
 
-	public void endSheet() {
+	public static int cmToEmu(final double distanceInCm) {
+		return (int) (distanceInCm * Units.EMU_PER_CENTIMETER);
+	}
+
+	public void endSheet(final boolean useSwissRowingLogo) {
 		final CreationHelper helper = wb.getCreationHelper();
 		// Create the drawing patriarch.  This is the top level container for all shapes.
 		final Drawing<?> drawing = sheet.createDrawingPatriarch();
-		// images must be after other sizing in the page to avoid some silly resizing effects
-		{
-			final ClientAnchor anchor = helper.createClientAnchor();
-			anchor.setAnchorType(AnchorType.MOVE_DONT_RESIZE);
-//			template pos: .36cm x; .15cm y
-//			template size: 2.65L; 2.38H (A1)
-			// set top-left corner of the picture,
-//			anchor.setCol1(1);
-//			anchor.setRow1(1);
-//			anchor.setCol2(3);
-//			anchor.setRow2(1);
-			anchor.setDx1(200);
-			anchor.setDy1(0);
-			anchor.setDx2(1000);
-			anchor.setDy2(1000);
-			final Picture pict = drawing.createPicture(anchor,
-					logoIdx.get(Logo.LEMAN_SUR_MER));
-			pict.resize();
+		final ClientAnchor anchor = helper.createClientAnchor();
+		anchor.setAnchorType(AnchorType.DONT_MOVE_AND_RESIZE);
+		anchor.setCol1(0);
+		anchor.setRow1(0);
+		anchor.setCol2(2);
+		anchor.setRow2(4);
+		// coordinates must be in cell, else strange "Jumps" may occur
+		anchor.setDx1(cmToEmu(.4));
+		anchor.setDy1(cmToEmu(.4));
+		if (useSwissRowingLogo) {
+			// use Swiss Rowing logo
+			// base size: 348x390 (0.8923)
+			anchor.setDx2(cmToEmu(.69));
+			anchor.setDy2(cmToEmu(.2));
+			drawing.createPicture(anchor, logoIdx.get(Logo.SWISS_ROWING));
+		} else {
+			// default: use LSM logo
+			// base size: 566x566
+			anchor.setDx2(cmToEmu(.96));
+			anchor.setDy2(cmToEmu(.2));
+			drawing.createPicture(anchor, logoIdx.get(Logo.LEMAN_SUR_MER));
 		}
-		{
-//			template pos: 2.69cm x; 0cm y
-//			template size: 1.88L; 2.26H (B1)
-			final ClientAnchor anchor = helper.createClientAnchor();
-			anchor.setAnchorType(AnchorType.MOVE_DONT_RESIZE);
-			// set top-left corner of the picture,
-			anchor.setCol1(0);
-			anchor.setRow1(0);
-			//anchor.setDy1(900);
-			final Picture pict = drawing.createPicture(anchor,
-					logoIdx.get(Logo.SWISS_ROWING));
-			pict.resize();
-		}
+
+		setPrintArea();
 	}
 
-	private void initHeader() {
+	private void setPrintArea() {
+		final PrintSetup printSetup = sheet.getPrintSetup();
+		printSetup.setFitWidth((short) 1);
+		printSetup.setLandscape(false);
+		printSetup.setPaperSize(PrintSetup.A4_PAPERSIZE);
 
+		sheet.setPrintGridlines(false);
+		sheet.setAutobreaks(false);
+		wb.setPrintArea(wb.getSheetIndex(sheet), 0, 5, 0, rownum - 1);
+		// we could maybe repeat first lines on each page
+	}
+
+	private void initHeader(final String header) {
+		// TODO: this is too complex. Check if simpler to use a template instead (but need to have a template for both XLS and XLSX ?)
 		Row row = sheet.createRow(rownum);
 		Cell cell = row.createCell(0);
 		CellStyle cellStyle = wb.createCellStyle();
@@ -231,14 +239,13 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		font.setFontHeightInPoints((short) 13);
 		cellStyle.setFont(font);
 		cell.setCellStyle(cellStyle);
-		// TODO set/adapt content based on sheet name/index
-		cell.setCellValue("Résultats des Championnats suisses d'aviron de mer");
-		//cell.setCellValue("Résultats par catégorie");
+		cell.setCellValue(header);
 		sheet.addMergedRegion(new CellRangeAddress(rownum, rownum, 0, 5));
 		rownum++;
 
-		// TODO make text configurable
-
+		row = sheet.createRow(rownum);
+		row.setHeightInPoints(15);
+		rownum++;
 	}
 
 	private Font createFontForHeader() {
@@ -329,14 +336,9 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	@Override
 	public List<SubResult> getSubResults(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
-		return Arrays.asList(new ExcelSubResult("TOUS") {
-
-			@Override
-			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-				return results;
-			}
-
-		}, new ExcelSubResult("Championnat Suisse") {
+		// TODO rendre les labels configurables/lire depuis un fichier .properties
+		return Arrays.asList(new ExcelSubResult("Championnat Suisse",
+				"Résultats des Championnats suisses d'aviron de mer", true) {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
@@ -345,16 +347,27 @@ abstract class ExcelPrintHelper implements PrintHelper {
 						.collect(getCollector(results));
 			}
 
-		}, new ExcelSubResult("LSM hors championnat Suisse") {
+		},
+				new ExcelSubResult("LSM hors championnat Suisse",
+						"Résultats de Lausanne sur mer", false) {
 
-			@Override
-			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-				return results.entrySet().stream()
-						.filter(e -> !e.getKey().isSwissChampionshipCategory())
-						.collect(getCollector(results));
-			}
+					@Override
+					public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+						return results.entrySet().stream().filter(
+								e -> !e.getKey().isSwissChampionshipCategory())
+								.collect(getCollector(results));
+					}
 
-		});
+				},
+				new ExcelSubResult("TOUS", "Résultats de toutes les courses",
+						false) {
+
+					@Override
+					public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
+						return results;
+					}
+
+				});
 	}
 
 	private Collector<Entry<EventCategoryKey, List<CategoryResult>>, ?, TreeMap<EventCategoryKey, List<CategoryResult>>> getCollector(
@@ -374,19 +387,26 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 		private final String name;
 
-		ExcelSubResult(final String name) {
+		private final String header;
+
+		private final boolean useSwissRowingLogo;
+
+		ExcelSubResult(final String name, final String header,
+				final boolean useSwissRowingLogo) {
 			this.name = name;
+			this.header = header;
+			this.useSwissRowingLogo = useSwissRowingLogo;
 		}
 
 		@Override
 		public void init() {
-			initSheet(name);
+			initSheet(name, header);
 		}
 
 		@Override
 		public void end() {
 			// default: nothing to do
-			endSheet();
+			endSheet(useSwissRowingLogo);
 		}
 
 		@Override
