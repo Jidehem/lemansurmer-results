@@ -18,12 +18,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.util.StringUtil;
 
 /**
  * @author Jean-David Maillefer, 2023
@@ -110,32 +109,8 @@ public class LSM {
 		}
 	}
 
-	private final static Pattern EVENT_ENUM_PATTERN_23 = Pattern
-			.compile("(.) ([A-Z])");
-
-	private final static Pattern EVENT_ENUM_PATTERN_23_COMBINED = Pattern
-			.compile("(.) ([A-Z])\\.(\\d+)");
-
-	private final static Pattern EVENT_ENUM_PATTERN_22 = Pattern
-			.compile("(\\d+)");
-
 	private EventId extractEventNum(final CSVRecord record) {
-		final String eventNumRaw = record.get(CsvResultHeaders.EventNum);
-		Matcher matcher = EVENT_ENUM_PATTERN_22.matcher(eventNumRaw);
-		if (matcher.matches()) {
-			return new EventId(null, null, Integer.parseInt(matcher.group(1)));
-		}
-		matcher = EVENT_ENUM_PATTERN_23_COMBINED.matcher(eventNumRaw);
-		if (matcher.matches()) {
-			return new EventId(matcher.group(1), matcher.group(2),
-					Integer.parseInt(matcher.group(3)));
-		}
-		matcher = EVENT_ENUM_PATTERN_23.matcher(eventNumRaw);
-		if (matcher.matches()) {
-			return new EventId(matcher.group(1), matcher.group(2), null);
-		}
-		throw new RuntimeException(
-				"Failed to detect pattern for eventId " + eventNumRaw);
+		return EventId.from(record.get(CsvResultHeaders.EventNum));
 	}
 
 	private void fixRankAndDelta(
@@ -147,7 +122,10 @@ public class LSM {
 			LocalTime firstFinish = null;
 			for (final CategoryResult categoryResult : crs) {
 				nb++;
-				final LocalTime finish = LocalTime.parse(categoryResult.finish);
+				LocalTime finish = null;
+				if (StringUtil.isNotBlank(categoryResult.finish)) {
+					finish = LocalTime.parse(categoryResult.finish);
+				}
 				if (firstFinish == null) {
 					firstFinish = finish;
 					categoryResult.delta = null;
@@ -159,7 +137,7 @@ public class LSM {
 					categoryResult.delta = deltaLT.format(DELTA_FORMATTER);
 				}
 				// compute rank in category
-				if (finish.compareTo(lastFinish) == 0) {
+				if (finish == null || finish.compareTo(lastFinish) == 0) {
 					// equality
 					categoryResult.categoryRank = lastRank;
 				} else {
@@ -219,6 +197,9 @@ public class LSM {
 	}
 
 	private String getStartTime(final String start) {
+		if (start == null) {
+			return "<startTime>";
+		}
 		LocalTime time = LocalTime.parse(start);
 		int minute = time.getMinute();
 		minute = ((int) Math.round(minute / 5.0)) * 5;
@@ -236,6 +217,7 @@ public class LSM {
 		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : results
 				.entrySet()) {
 			final EventCategoryKey eventCategoryKey = entry.getKey();
+			// FIXME handle case of masters that should be merged too, but only for CH champ categories ?!?
 			// FIXME handle Warning: no standard category found for EventCategoryKey[event=🐟 D.15, category=Mix C2x*]
 			if (eventCategoryKey.isSwissChampionshipCategory()) {
 				// add it to the corresponding non-swiss championship category
@@ -246,8 +228,8 @@ public class LSM {
 							final EventCategoryKey key = e.getKey();
 							return standardCategory.equals(key.category())
 									&& Objects.equals(
-											eventCategoryKey.event().letter(),
-											key.event().letter());
+											eventCategoryKey.event().emoji(),
+											key.event().emoji());
 						}).map(e -> e.getValue()).toList();
 				if (standardRes.isEmpty()) {
 					System.out
