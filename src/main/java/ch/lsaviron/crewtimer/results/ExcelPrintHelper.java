@@ -396,7 +396,9 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-				return results;
+				return results.entrySet().stream()
+						.filter(e -> !e.getKey().isSwissChampionshipCategory())
+						.collect(getCollector(results));
 			}
 
 		});

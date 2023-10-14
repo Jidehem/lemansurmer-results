@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -214,11 +215,11 @@ public class LSM {
 	// duplicate/merge some special categories to have correct result
 	private void mergeSpecialCategories(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
-		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : results
-				.entrySet()) {
+		// copy since modified
+		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : new HashSet<>(
+				results.entrySet())) {
 			final EventCategoryKey eventCategoryKey = entry.getKey();
 			// FIXME handle case of masters that should be merged too, but only for CH champ categories ?!?
-			// FIXME handle Warning: no standard category found for EventCategoryKey[event=🐟 D.15, category=Mix C2x*]
 			if (eventCategoryKey.isSwissChampionshipCategory()) {
 				// add it to the corresponding non-swiss championship category
 				final String standardCategory = eventCategoryKey
@@ -231,22 +232,28 @@ public class LSM {
 											eventCategoryKey.event().emoji(),
 											key.event().emoji());
 						}).map(e -> e.getValue()).toList();
+				final List<CategoryResult> crs;
 				if (standardRes.isEmpty()) {
-					System.out
-							.println("Warning: no standard category found for "
-									+ eventCategoryKey);
+					System.out.printf(
+							"Info: no standard category found for %s%n",
+							eventCategoryKey);
+					// create corresponding category
+					final EventCategoryKey eck = new EventCategoryKey(
+							eventCategoryKey.event(), standardCategory);
+					crs = new ArrayList<>();
+					results.put(eck, crs);
 				} else if (standardRes.size() > 1) {
 					throw new RuntimeException("Found " + standardRes.size()
 							+ " results while expecting only one for "
 							+ eventCategoryKey);
 				} else {
-					// we need to (deep-)copy each value since they will be modified
-					final List<CategoryResult> crs = standardRes.get(0);
-					entry.getValue().stream().map(CategoryResult::new)
-							.forEachOrdered(crs::add);
-					crs.sort(Comparator.comparing(cr -> cr.eventRank,
-							Comparator.nullsLast(Comparator.naturalOrder())));
+					crs = standardRes.get(0);
 				}
+				// we need to (deep-)copy each value since they will be modified
+				entry.getValue().stream().map(CategoryResult::new)
+						.forEachOrdered(crs::add);
+				crs.sort(Comparator.comparing(cr -> cr.eventRank,
+						Comparator.nullsLast(Comparator.naturalOrder())));
 			}
 		}
 	}
