@@ -5,6 +5,10 @@ import java.util.Comparator;
 public record EventCategory(AgeCategory age, SexCategory sex,
 		RowingCategory rowing, int rowers, OarCategory oar, boolean coxed) {
 
+	public static final Comparator<EventCategory> BY_EXPECTED_SPEED_COMPARATOR = Comparator
+			.comparing(EventCategory::rowers).reversed()
+			.thenComparing(EventCategory::sex);
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();

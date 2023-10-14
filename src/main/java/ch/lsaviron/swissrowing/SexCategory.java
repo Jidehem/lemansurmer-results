@@ -2,6 +2,7 @@ package ch.lsaviron.swissrowing;
 
 public enum SexCategory {
 
+	// order by expected speed decreasing
 	MEN("M"),
 	MIXED("Mix"),
 	WOMEN("W");
