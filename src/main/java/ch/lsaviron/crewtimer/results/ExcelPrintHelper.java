@@ -155,33 +155,43 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		return (int) (distanceInCm * Units.EMU_PER_CENTIMETER);
 	}
 
-	public void endSheet(final boolean useSwissRowingLogo) {
+	public void endSheet() {
 		final CreationHelper helper = wb.getCreationHelper();
 		// Create the drawing patriarch.  This is the top level container for all shapes.
 		final Drawing<?> drawing = sheet.createDrawingPatriarch();
-		final ClientAnchor anchor = helper.createClientAnchor();
-		anchor.setAnchorType(AnchorType.DONT_MOVE_AND_RESIZE);
-		anchor.setCol1(0);
-		anchor.setRow1(0);
-		anchor.setCol2(2);
-		anchor.setRow2(4);
-		// coordinates must be in cell, else strange "Jumps" may occur
-		anchor.setDx1(cmToEmu(.4));
-		anchor.setDy1(cmToEmu(.4));
-		if (useSwissRowingLogo) {
-			// use Swiss Rowing logo
-			// base size: 348x390 (0.8923)
-			anchor.setDx2(cmToEmu(.69));
-			anchor.setDy2(cmToEmu(.2));
-			drawing.createPicture(anchor, logoIdx.get(Logo.SWISS_ROWING));
-		} else {
-			// default: use LSM logo
+		{
+			// LSM logo
+			final ClientAnchor anchor = helper.createClientAnchor();
+			anchor.setAnchorType(AnchorType.DONT_MOVE_AND_RESIZE);
+			anchor.setCol1(0);
+			anchor.setRow1(0);
+			anchor.setCol2(2);
+			anchor.setRow2(4);
+			// coordinates must be in cell, else strange "Jumps" may occur
+			anchor.setDx1(cmToEmu(.4));
+			anchor.setDy1(cmToEmu(.4));
 			// base size: 566x566
 			anchor.setDx2(cmToEmu(.96));
 			anchor.setDy2(cmToEmu(.2));
 			drawing.createPicture(anchor, logoIdx.get(Logo.LEMAN_SUR_MER));
 		}
 
+		{
+			final ClientAnchor anchor = helper.createClientAnchor();
+			anchor.setAnchorType(AnchorType.DONT_MOVE_AND_RESIZE);
+			anchor.setCol1(0);
+			anchor.setRow1(0);
+			anchor.setCol2(5);
+			anchor.setRow2(4);
+			// coordinates must be in cell, else strange "Jumps" may occur
+			anchor.setDx1(cmToEmu(20.35));
+			anchor.setDy1(cmToEmu(.4));
+			// Swiss Rowing logo
+			// base size: 348x390 (0.8923)
+			anchor.setDx2(cmToEmu(2));
+			anchor.setDy2(cmToEmu(.2));
+			drawing.createPicture(anchor, logoIdx.get(Logo.SWISS_ROWING));
+		}
 		setPrintArea();
 	}
 
@@ -364,7 +374,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	@Override
 	public List<SubResult> getSubResults(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
-		return Arrays.asList(new ExcelSubResult("swissChampionship", true) {
+		return Arrays.asList(new ExcelSubResult("swissChampionship") {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
@@ -373,7 +383,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 						.collect(getCollector(results));
 			}
 
-		}, new ExcelSubResult("lsm", false) {
+		}, new ExcelSubResult("lsm") {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
@@ -382,7 +392,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 						.collect(getCollector(results));
 			}
 
-		}, new ExcelSubResult("all", false) {
+		}, new ExcelSubResult("all") {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
@@ -409,12 +419,8 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 		private final String keyPrefix;
 
-		private final boolean useSwissRowingLogo;
-
-		ExcelSubResult(final String keyPrefix,
-				final boolean useSwissRowingLogo) {
+		ExcelSubResult(final String keyPrefix) {
 			this.keyPrefix = keyPrefix;
-			this.useSwissRowingLogo = useSwissRowingLogo;
 		}
 
 		@Override
@@ -424,8 +430,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 		@Override
 		public void end() {
-			// default: nothing to do
-			endSheet(useSwissRowingLogo);
+			endSheet();
 		}
 
 	}
