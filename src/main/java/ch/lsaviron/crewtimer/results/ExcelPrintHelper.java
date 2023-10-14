@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.PageMargin;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -40,6 +41,8 @@ import org.apache.poi.util.Units;
 abstract class ExcelPrintHelper implements PrintHelper {
 
 	private static final String DEFAULT_FONT_NAME = "Trebuchet MS";
+
+	private static final double CM_PER_INCH = 2.54d;
 
 	private final String outputFile;
 
@@ -145,6 +148,12 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		// print settings
 		final PrintSetup ps = sheet.getPrintSetup();
 		ps.setFitWidth((short) 1);
+
+		// set margins
+		sheet.setMargin(PageMargin.TOP, 0.5 / CM_PER_INCH/* inches */ );
+		sheet.setMargin(PageMargin.RIGHT, 0.5 / CM_PER_INCH/* inches */ );
+		sheet.setMargin(PageMargin.BOTTOM, 0.5 / CM_PER_INCH/* inches */ );
+		sheet.setMargin(PageMargin.LEFT, 0.5 / CM_PER_INCH/* inches */ );
 
 		//sheet.setDefaultRowHeight((short) 300);
 
@@ -384,15 +393,6 @@ abstract class ExcelPrintHelper implements PrintHelper {
 			}
 
 		}, new ExcelSubResult("lsm") {
-
-			@Override
-			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-				return results.entrySet().stream()
-						.filter(e -> !e.getKey().isSwissChampionshipCategory())
-						.collect(getCollector(results));
-			}
-
-		}, new ExcelSubResult("all") {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
