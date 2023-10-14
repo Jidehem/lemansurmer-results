@@ -130,6 +130,9 @@ public class LSM {
 				if (firstFinish == null) {
 					firstFinish = finish;
 					categoryResult.delta = null;
+				} else if (finish == null) {
+					// typically a DNS: do nothing
+
 				} else {
 					// adapt delta compared to first
 					final Duration delta = Duration.between(firstFinish,
@@ -173,6 +176,7 @@ public class LSM {
 
 			// race header
 			final EventCategoryKey res = entry.getKey();
+			System.out.printf("-----%nevent category key: %s%n", res);
 			String extraSwissChampionship = "";
 			if (res.isSwissChampionshipCategory()) {
 				extraSwissChampionship = " 🏆🇨🇭";
@@ -191,7 +195,8 @@ public class LSM {
 						cr.crewAbbrev,
 						cr.crew,
 						cr.adjTime,
-						cr.delta);
+						cr.delta,
+						cr.start);
 			}
 			printHelper.printRaceFooter();
 		}
@@ -200,6 +205,9 @@ public class LSM {
 	private String getStartTime(final String start) {
 		if (start == null) {
 			return "<startTime>";
+		}
+		if (start.equals("DNS")) {
+			return start;
 		}
 		LocalTime time = LocalTime.parse(start);
 		int minute = time.getMinute();

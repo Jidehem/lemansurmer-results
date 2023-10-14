@@ -351,19 +351,22 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	@Override
 	public void printResultRow(final Integer categoryRank, final String medals,
 			final String crewAbbrev, final String crew, final String adjTime,
-			final String delta) {
+			final String delta, final String start) {
 		final Row row = sheet.createRow(rownum++);
 		// to allow auto-format for too long values
 		row.setHeight((short) -1);
 		int col = 0;
-		row.createCell(col++).setCellValue(categoryRank);
+		row.createCell(col++)
+				.setCellValue(PrintHelper.formatRank(categoryRank));
 		row.createCell(col++).setCellValue(medals);
 		row.createCell(col++).setCellValue(crewAbbrev);
 		final Cell cell = row.createCell(col++);
 		cell.setCellValue(crew);
 		cell.setCellStyle(crewCellStyle);
-		row.createCell(col++).setCellValue(adjTime);
+		row.createCell(col++)
+				.setCellValue(PrintHelper.formatAdjTime(adjTime, start));
 		row.createCell(col++).setCellValue(PrintHelper.formatDelta(delta));
+		System.out.printf("rank: %s crew: %s%n", categoryRank, crewAbbrev);
 	}
 
 	@Override

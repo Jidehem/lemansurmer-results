@@ -32,15 +32,15 @@ enum PrintMode {
 			@Override
 			public void printResultRow(final Integer categoryRank,
 					final String medals, final String crewAbbrev,
-					final String crew, final String adjTime,
-					final String delta) {
+					final String crew, final String adjTime, final String delta,
+					final String start) {
 
 				System.out.printf("%d: %s\t%s\t%s\t%s\t%s%n",
 						categoryRank,
 						medals,
 						crewAbbrev,
 						crew,
-						adjTime,
+						PrintHelper.formatAdjTime(adjTime, start),
 						PrintHelper.formatDelta(delta));
 			}
 
@@ -81,15 +81,15 @@ enum PrintMode {
 			@Override
 			public void printResultRow(final Integer categoryRank,
 					final String medals, final String crewAbbrev,
-					final String crew, final String adjTime,
-					final String delta) {
+					final String crew, final String adjTime, final String delta,
+					final String start) {
 
 				System.out.printf("%d\t%s\t%s\t%s\t%s\t'%s%n",
 						categoryRank,
 						medals,
 						crewAbbrev,
 						crew,
-						adjTime,
+						PrintHelper.formatAdjTime(adjTime, start),
 						PrintHelper.formatDelta(delta));
 			}
 
@@ -116,7 +116,8 @@ enum PrintMode {
 
 		@Override
 		PrintHelper buildHelper(final LSM lsm) {
-			return new ExcelPrintHelper(buildOutputFile(lsm, ".xls").toString()) {
+			return new ExcelPrintHelper(
+					buildOutputFile(lsm, ".xls").toString()) {
 
 				@Override
 				Workbook createWorkbook() throws IOException {
