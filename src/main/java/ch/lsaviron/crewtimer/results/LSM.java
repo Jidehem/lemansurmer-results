@@ -125,15 +125,21 @@ public class LSM {
 	}
 
 	private void printDiffBugColumns(final CSVRecord record) {
-		final String deltaBug = record.get(CsvResultHeaders
-				.values()[CsvResultHeaders.Delta.ordinal() - 2]);
 		final String crew = record.get(CsvResultHeaders.CrewAbbrev);
 		final String eventNum = record.get(CsvResultHeaders.EventNum);
-		final String event = record.get(CsvResultHeaders.Event);
-		final String recordId = eventNum + " " + crew + " " + event;
+		final String category = record.get(CsvResultHeaders.Stroke);
+		final String crewFull = record.get(CsvResultHeaders.Crew);
+		final String recordId = eventNum + " - " + category + "; " + crew + ": "
+				+ crewFull;
+
+		final String deltaBug = record.get(CsvResultHeaders
+				.values()[CsvResultHeaders.Delta.ordinal() - 2]);
 		final String delta = record.get(CsvResultHeaders.Delta);
 		if (!Objects.equals(deltaBug, delta) && deltaBug != null) {
-			System.err.printf("d: %s / %s (%s)%n", deltaBug, delta, recordId);
+			System.err.printf("Différence sur \"delta\": %s / %s (%s)%n",
+					deltaBug,
+					delta,
+					recordId);
 		}
 
 		final String adjTimeBug = record.get(CsvResultHeaders
@@ -141,7 +147,8 @@ public class LSM {
 		final String adjTime = record.get(CsvResultHeaders.AdjTime);
 		if (!Objects.equals(adjTimeBug, adjTime) && !"DNS".equals(adjTime)
 				&& !"DNF".equals(adjTime)) {
-			System.err.printf("at: %s / %s (%s)%n",
+			System.err.printf(
+					"Différence sur temps final ajusté: %s / %s (%s)%n",
 					adjTimeBug,
 					adjTime,
 					recordId);
