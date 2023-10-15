@@ -188,12 +188,12 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		{
 			final ClientAnchor anchor = helper.createClientAnchor();
 			anchor.setAnchorType(AnchorType.DONT_MOVE_AND_RESIZE);
-			anchor.setCol1(0);
+			anchor.setCol1(4);
 			anchor.setRow1(0);
 			anchor.setCol2(5);
 			anchor.setRow2(4);
 			// coordinates must be in cell, else strange "Jumps" may occur
-			anchor.setDx1(cmToEmu(20.35));
+			anchor.setDx1(cmToEmu(2.03));
 			anchor.setDy1(cmToEmu(.4));
 			// Swiss Rowing logo
 			// base size: 348x390 (0.8923)
