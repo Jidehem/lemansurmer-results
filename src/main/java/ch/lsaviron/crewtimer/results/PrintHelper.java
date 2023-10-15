@@ -30,10 +30,12 @@ interface PrintHelper {
 			SortedMap<EventCategoryKey, List<CategoryResult>> results);
 
 	static String formatAdjTime(final String adjTime, final String start) {
+		if (adjTime == null) {
+			return "(inconnu)";
+		}
 		if ("DNS".equals(start)) {
 			return start;
 		}
-		// FIXME DNF not working/implemented incorrectly
 		if ("DNF".equals(adjTime)) {
 			return adjTime;
 		}

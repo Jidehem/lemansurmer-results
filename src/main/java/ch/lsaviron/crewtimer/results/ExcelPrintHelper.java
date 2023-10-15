@@ -366,7 +366,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		row.createCell(col++)
 				.setCellValue(PrintHelper.formatAdjTime(adjTime, start));
 		row.createCell(col++).setCellValue(PrintHelper.formatDelta(delta));
-		System.out.printf("rank: %s crew: %s%n", categoryRank, crewAbbrev);
+		//System.out.printf("rank: %s crew: %s%n", categoryRank, crewAbbrev);
 	}
 
 	@Override

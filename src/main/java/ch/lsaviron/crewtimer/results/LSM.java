@@ -79,14 +79,25 @@ public class LSM {
 
 			// workaround a bug in CrewTimer CSV: the disqualified teams have no start time
 			String lastStart = null;
+			int line = 1;
 			for (final CSVRecord record : parser) {
 				//System.out.println(record);
+				if (record.size() != CsvResultHeaders.values().length) {
+					throw new IOException(String.format(
+							"Inconsistent number of fields in CSV line %d (%s)%nCheck that data in %s is consistent"
+									+ " and/or class %s contains all header names",
+							++line,
+							record,
+							resultsFromCrewTimerCsv,
+							CsvResultHeaders.class.getSimpleName()));
+				}
 				String start = record.get(CsvResultHeaders.Start);
 				if (start == null) {
 					start = lastStart;
 				} else {
 					lastStart = start;
 				}
+				System.our.println();
 				final var cr = new CategoryResult(extractEventNum(record),
 						record.get(CsvResultHeaders.Event),
 						Optional.ofNullable(record.get(CsvResultHeaders.Place))
@@ -176,7 +187,7 @@ public class LSM {
 
 			// race header
 			final EventCategoryKey res = entry.getKey();
-			System.out.printf("-----%nevent category key: %s%n", res);
+			//System.out.printf("-----%nevent category key: %s%n", res);
 			String extraSwissChampionship = "";
 			if (res.isSwissChampionshipCategory()) {
 				extraSwissChampionship = " 🏆🇨🇭";
