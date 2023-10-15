@@ -206,14 +206,17 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	private void setPrintArea() {
 		final PrintSetup printSetup = sheet.getPrintSetup();
+		sheet.setFitToPage(true);
 		printSetup.setFitWidth((short) 1);
+		printSetup.setFitHeight((short) 0);
 		printSetup.setLandscape(false);
 		printSetup.setPaperSize(PrintSetup.A4_PAPERSIZE);
 
 		sheet.setPrintGridlines(false);
 		sheet.setAutobreaks(false);
-		wb.setPrintArea(wb.getSheetIndex(sheet), 0, 5, 0, rownum - 1);
-		// we could maybe repeat first lines on each page
+		wb.setPrintArea(wb.getSheetIndex(sheet), 0, 5, 5, rownum - 1);
+		// repeat first 5 rows on each page
+		sheet.setRepeatingRows(CellRangeAddress.valueOf("1:5"));
 	}
 
 	private void initHeader(final String keyPrefix) {
