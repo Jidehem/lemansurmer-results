@@ -32,15 +32,15 @@ enum PrintMode {
 			@Override
 			public void printResultRow(final Integer categoryRank,
 					final String medals, final String crewAbbrev,
-					final String crew, final String adjTime, final String delta,
-					final String start) {
+					final String crew, final String adjTime,
+					final String delta) {
 
 				System.out.printf("%d: %s\t%s\t%s\t%s\t%s%n",
 						categoryRank,
 						medals,
 						crewAbbrev,
 						crew,
-						PrintHelper.formatAdjTime(adjTime, start),
+						PrintHelper.formatAdjTime(adjTime),
 						PrintHelper.formatDelta(delta));
 			}
 
@@ -81,15 +81,15 @@ enum PrintMode {
 			@Override
 			public void printResultRow(final Integer categoryRank,
 					final String medals, final String crewAbbrev,
-					final String crew, final String adjTime, final String delta,
-					final String start) {
+					final String crew, final String adjTime,
+					final String delta) {
 
 				System.out.printf("%d\t%s\t%s\t%s\t%s\t'%s%n",
 						categoryRank,
 						medals,
 						crewAbbrev,
 						crew,
-						PrintHelper.formatAdjTime(adjTime, start),
+						PrintHelper.formatAdjTime(adjTime),
 						PrintHelper.formatDelta(delta));
 			}
 

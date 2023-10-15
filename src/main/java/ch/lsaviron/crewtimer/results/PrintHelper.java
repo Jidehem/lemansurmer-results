@@ -11,7 +11,7 @@ interface PrintHelper {
 	void printRaceHeader(String header);
 
 	void printResultRow(Integer categoryRank, String medals, String crewAbbrev,
-			String crew, String adjTime, String delta, String start);
+			String crew, String adjTime, String delta);
 
 	void printRaceFooter();
 
@@ -29,15 +29,9 @@ interface PrintHelper {
 	List<SubResult> getSubResults(
 			SortedMap<EventCategoryKey, List<CategoryResult>> results);
 
-	static String formatAdjTime(final String adjTime, final String start) {
+	static String formatAdjTime(final String adjTime) {
 		if (adjTime == null) {
 			return "(inconnu)";
-		}
-		if ("DNS".equals(start)) {
-			return start;
-		}
-		if ("DNF".equals(adjTime)) {
-			return adjTime;
 		}
 		return adjTime;
 	}

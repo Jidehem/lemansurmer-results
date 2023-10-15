@@ -97,7 +97,10 @@ public class LSM {
 				} else {
 					lastStart = start;
 				}
-				System.our.println();
+
+				// FIXME remove debug
+				printDiffBugColumns(record);
+				// test delta bouées
 				final var cr = new CategoryResult(extractEventNum(record),
 						record.get(CsvResultHeaders.Event),
 						Optional.ofNullable(record.get(CsvResultHeaders.Place))
@@ -118,6 +121,30 @@ public class LSM {
 			fixRankAndDelta(results);
 
 			printResults(results);
+		}
+	}
+
+	private void printDiffBugColumns(final CSVRecord record) {
+		final String deltaBug = record.get(CsvResultHeaders
+				.values()[CsvResultHeaders.Delta.ordinal() - 2]);
+		final String crew = record.get(CsvResultHeaders.CrewAbbrev);
+		final String eventNum = record.get(CsvResultHeaders.EventNum);
+		final String event = record.get(CsvResultHeaders.Event);
+		final String recordId = eventNum + " " + crew + " " + event;
+		final String delta = record.get(CsvResultHeaders.Delta);
+		if (!Objects.equals(deltaBug, delta) && deltaBug != null) {
+			System.err.printf("d: %s / %s (%s)%n", deltaBug, delta, recordId);
+		}
+
+		final String adjTimeBug = record.get(CsvResultHeaders
+				.values()[CsvResultHeaders.AdjTime.ordinal() - 2]);
+		final String adjTime = record.get(CsvResultHeaders.AdjTime);
+		if (!Objects.equals(adjTimeBug, adjTime) && !"DNS".equals(adjTime)
+				&& !"DNF".equals(adjTime)) {
+			System.err.printf("at: %s / %s (%s)%n",
+					adjTimeBug,
+					adjTime,
+					recordId);
 		}
 	}
 
@@ -206,8 +233,7 @@ public class LSM {
 						cr.crewAbbrev,
 						cr.crew,
 						cr.adjTime,
-						cr.delta,
-						cr.start);
+						cr.delta);
 			}
 			printHelper.printRaceFooter();
 		}
