@@ -4,7 +4,9 @@ Dans Eclipse:
 
 Exemple de run configuration:
 - `<path-to-result-file> <print-mode>`
-  with print-mode in `SCREEN, TSV, XLS, XSLX`
+  with
+  - `path-to-result-file` the path to a result file exported from Crewtimer (i.e. https://admin.crewtimer.com/)
+  - `print-mode` in `SCREEN, TSV, XLS, XSLX`
   
 Arguments:
 - `src/main/data/r12944.csv XLSX`
