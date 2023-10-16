@@ -14,10 +14,8 @@ Arguments:
 
 1. Vérifier les résultats
   - Les adapter manuellemant si nécessaire
-1. Pour chaque onglet, définir les zones d'impression
-  1. Définir les premières lignes comme "à répéter sur chaque page" dans la mise en page
-  1. Vérifier le format de page
-  1. Vérifier les sauts de pages et les adapter manuellement
+1. Pour chaque onglet, les zones d'impression sont déjà définies
+  - Vérifier les sauts de pages et les adapter manuellement (il n'est pas possible de calculer correctement la hauteur des lignes. Il s'agit donc d'une estimation.
   
 Ne pas oublier de tester avec Excel !
 (OpenOffice se comporte différemment dans certains cas, notamment pour les cellules fusionnées)

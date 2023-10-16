@@ -8,12 +8,15 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -40,9 +43,15 @@ import org.apache.poi.util.Units;
  */
 abstract class ExcelPrintHelper implements PrintHelper {
 
+	private static final double MARGIN_CM = 0.5;
+
 	private static final String DEFAULT_FONT_NAME = "Trebuchet MS";
 
 	private static final double CM_PER_INCH = 2.54d;
+
+	private static final int POINTS_PER_INCH = 72;
+
+	private static final int TWIPS_PER_POINT = 20;
 
 	private final String outputFile;
 
@@ -61,6 +70,8 @@ abstract class ExcelPrintHelper implements PrintHelper {
 	private EnumMap<Logo, Integer> logoIdx;
 
 	private final Properties messages;
+
+	private final Map<String, TreeSet<Integer>> raceHeaderRowNumsBySheetName = new HashMap<>();
 
 	enum Logo {
 
@@ -119,6 +130,11 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		crewCellStyle.setWrapText(true);
 
 		messages = loadMessages();
+
+		System.out.println(
+				"Attention: comme la hauteur par défaut (-1) est utilisée pour que certaines cellules soit dimensionnées automatiquement"
+						+ " en fonction de leur contenu, les sauts de page ne seront pas calculés juste."
+						+ " Il faudra donc les vérifier avec soin.");
 	}
 
 	private void initImages() {
@@ -150,12 +166,11 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		ps.setFitWidth((short) 1);
 
 		// set margins
-		sheet.setMargin(PageMargin.TOP, 0.5 / CM_PER_INCH/* inches */ );
-		sheet.setMargin(PageMargin.RIGHT, 0.5 / CM_PER_INCH/* inches */ );
-		sheet.setMargin(PageMargin.BOTTOM, 0.5 / CM_PER_INCH/* inches */ );
-		sheet.setMargin(PageMargin.LEFT, 0.5 / CM_PER_INCH/* inches */ );
-
-		//sheet.setDefaultRowHeight((short) 300);
+		sheet.setMargin(PageMargin.TOP, MARGIN_CM / CM_PER_INCH/* inches */ );
+		sheet.setMargin(PageMargin.RIGHT, MARGIN_CM / CM_PER_INCH/* inches */ );
+		sheet.setMargin(PageMargin.BOTTOM,
+				MARGIN_CM / CM_PER_INCH/* inches */ );
+		sheet.setMargin(PageMargin.LEFT, MARGIN_CM / CM_PER_INCH/* inches */ );
 
 		initHeader(keyPrefix);
 	}
@@ -180,7 +195,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 			anchor.setDx1(cmToEmu(.4));
 			anchor.setDy1(cmToEmu(.4));
 			// base size: 566x566
-			anchor.setDx2(cmToEmu(.96));
+			anchor.setDx2(cmToEmu(1.12));
 			anchor.setDy2(cmToEmu(.2));
 			drawing.createPicture(anchor, logoIdx.get(Logo.LEMAN_SUR_MER));
 		}
@@ -193,11 +208,11 @@ abstract class ExcelPrintHelper implements PrintHelper {
 			anchor.setCol2(5);
 			anchor.setRow2(4);
 			// coordinates must be in cell, else strange "Jumps" may occur
-			anchor.setDx1(cmToEmu(2.03));
+			anchor.setDx1(cmToEmu(2.22));
 			anchor.setDy1(cmToEmu(.4));
 			// Swiss Rowing logo
 			// base size: 348x390 (0.8923)
-			anchor.setDx2(cmToEmu(2));
+			anchor.setDx2(cmToEmu(2.31));
 			anchor.setDy2(cmToEmu(.2));
 			drawing.createPicture(anchor, logoIdx.get(Logo.SWISS_ROWING));
 		}
@@ -217,6 +232,40 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		wb.setPrintArea(wb.getSheetIndex(sheet), 0, 5, 5, rownum - 1);
 		// repeat first 5 rows on each page
 		sheet.setRepeatingRows(CellRangeAddress.valueOf("1:5"));
+
+		// page breaks
+		final TreeSet<Integer> raceHeaderRowNums = raceHeaderRowNumsBySheetName
+				.get(sheet.getSheetName());
+		final short defaultSheetHeight = sheet.getDefaultRowHeight();
+		final short estimatedRealDefaultSheetHeight = 16 * TWIPS_PER_POINT;
+		//System.out.println("header rows: " + raceHeaderRowNums);
+		int pageHeight = 0;
+		int maxPageHeight = (int) Math.round(29.7d /* cm */
+				* POINTS_PER_INCH * TWIPS_PER_POINT / CM_PER_INCH);
+		maxPageHeight -= 2 * MARGIN_CM * POINTS_PER_INCH * TWIPS_PER_POINT
+				/ CM_PER_INCH;
+		for (int rownum = sheet.getFirstRowNum(); rownum <= sheet
+				.getLastRowNum(); ++rownum) {
+			final Row row = sheet.getRow(rownum);
+			short rowHeight = row.getHeight();
+			if (rowHeight == defaultSheetHeight) {
+				rowHeight = estimatedRealDefaultSheetHeight;
+			}
+			if (rownum < 5) {
+				// we remove the first 5 rows from page height
+				maxPageHeight -= rowHeight;
+			} else {
+				pageHeight += rowHeight;
+				if (pageHeight > maxPageHeight) {
+					final int lastHeaderRow = raceHeaderRowNums.floor(rownum);
+//					System.out.println(
+//							"Page break before rownum " + lastHeaderRow);
+					sheet.setRowBreak(lastHeaderRow - 1);
+					rownum = lastHeaderRow;
+					pageHeight = rowHeight;
+				}
+			}
+		}
 	}
 
 	private void initHeader(final String keyPrefix) {
@@ -316,6 +365,9 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 	@Override
 	public void printRaceHeader(final String header) {
+		raceHeaderRowNumsBySheetName
+				.computeIfAbsent(sheet.getSheetName(), key -> new TreeSet<>())
+				.add(rownum);
 		final Row row1 = sheet.createRow(rownum);
 		row1.setHeight((short) 1200);
 		final Cell cellHeader = row1.createCell(0);
