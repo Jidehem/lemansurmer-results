@@ -216,6 +216,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 			anchor.setDy2(cmToEmu(.2));
 			drawing.createPicture(anchor, logoIdx.get(Logo.SWISS_ROWING));
 		}
+
 		setPrintArea();
 	}
 
@@ -233,7 +234,13 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		// repeat first 5 rows on each page
 		sheet.setRepeatingRows(CellRangeAddress.valueOf("1:5"));
 
-		// page breaks
+		// page breaks computation disabled since not accurate due to use of default height/sizing by Excel.
+		if (false) {
+			computePageBreaks();
+		}
+	}
+
+	private void computePageBreaks() {
 		final TreeSet<Integer> raceHeaderRowNums = raceHeaderRowNumsBySheetName
 				.get(sheet.getSheetName());
 		final short defaultSheetHeight = sheet.getDefaultRowHeight();
