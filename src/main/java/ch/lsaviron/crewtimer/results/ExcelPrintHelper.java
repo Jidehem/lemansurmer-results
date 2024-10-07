@@ -442,6 +442,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
+		System.out.printf("Saved to %s%n", outputFile);
 	}
 
 	@Override
