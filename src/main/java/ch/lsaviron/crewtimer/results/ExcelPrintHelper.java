@@ -38,6 +38,8 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.util.Units;
 
+import ch.lsaviron.lsm.LsmEventCategory;
+
 /**
  * @author Jean-David Maillefer
  */
@@ -442,7 +444,7 @@ abstract class ExcelPrintHelper implements PrintHelper {
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
-		System.out.printf("Saved to %s%n", outputFile);
+		System.out.printf("Info: fichier sauvé dans %s%n", outputFile);
 	}
 
 	@Override
@@ -452,8 +454,8 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-				return results.entrySet().stream()
-						.filter(e -> e.getKey().isSwissChampionshipCategory())
+				return results.entrySet().stream().filter(e -> LsmEventCategory
+						.parse(e.getKey().category()).swissChampionship())
 						.collect(getCollector(results));
 			}
 
@@ -461,8 +463,8 @@ abstract class ExcelPrintHelper implements PrintHelper {
 
 			@Override
 			public SortedMap<EventCategoryKey, List<CategoryResult>> getResults() {
-				return results.entrySet().stream()
-						.filter(e -> !e.getKey().isSwissChampionshipCategory())
+				return results.entrySet().stream().filter(e -> !LsmEventCategory
+						.parse(e.getKey().category()).swissChampionship())
 						.collect(getCollector(results));
 			}
 

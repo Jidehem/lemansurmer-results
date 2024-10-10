@@ -1,15 +1,19 @@
 package ch.lsaviron.crewtimer.results;
 
+import java.io.FileNotFoundException;
 // Run with:
 // java -cp . LSM.java
 //
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -19,11 +23,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.util.StringUtil;
+
+import ch.lsaviron.lsm.LsmEventCategory;
+import ch.lsaviron.swissrowing.AgeCategory;
 
 /**
  * @author Jean-David Maillefer, 2023
@@ -58,13 +67,35 @@ public class LSM {
 			return;
 		}
 		final String resultsFromCrewTimerCsv = args[0];
-		final PrintMode printMode = PrintMode
-				.valueOf(args[1].toUpperCase(Locale.ENGLISH));
+		final PrintMode printMode;
+		try {
+			printMode = PrintMode.valueOf(args[1].toUpperCase(Locale.ROOT));
+		} catch (final IllegalArgumentException iae) {
+			System.err.printf("Print mode must be one of %s%n",
+					Arrays.toString(PrintMode.values()));
+			return;
+		}
 
 		new LSM(resultsFromCrewTimerCsv, printMode).processResults();
 	}
 
+	private String normalize(final String s) {
+		if (s == null) {
+			return null;
+		}
+		return Normalizer.normalize(s, Form.NFC);
+	}
+
 	private void processResults() throws IOException {
+		final var results = readRawResultsFromCsv();
+		//System.out.println(results.keySet());
+		mergeSpecialCategories(results);
+		fixRankAndDelta(results);
+		printResults(results);
+	}
+
+	private SortedMap<EventCategoryKey, List<CategoryResult>> readRawResultsFromCsv()
+			throws IOException, FileNotFoundException {
 		CSVParser parser;
 		// read CSV:
 		try (Reader in = new FileReader(resultsFromCrewTimerCsv)) {
@@ -81,6 +112,8 @@ public class LSM {
 			String lastStart = null;
 			int line = 1;
 			for (final CSVRecord record : parser) {
+				final Function<CsvResultHeaders, String> getData = header -> normalize(
+						record.get(header));
 				//System.out.println(record);
 				if (record.size() != CsvResultHeaders.values().length) {
 					throw new IOException(String.format(
@@ -91,7 +124,7 @@ public class LSM {
 							resultsFromCrewTimerCsv,
 							CsvResultHeaders.class.getSimpleName()));
 				}
-				String start = record.get(CsvResultHeaders.Start);
+				String start = getData.apply(CsvResultHeaders.Start);
 				if (start == null) {
 					start = lastStart;
 				} else {
@@ -99,31 +132,28 @@ public class LSM {
 				}
 
 				// test delta bouées
-				final var cr = new CategoryResult(extractEventNum(record),
-						record.get(CsvResultHeaders.Event),
-						Optional.ofNullable(record.get(CsvResultHeaders.Place))
+				final var cr = new CategoryResult(
+						EventId.from(getData.apply(CsvResultHeaders.EventNum)),
+						getData.apply(CsvResultHeaders.Event),
+						Optional.ofNullable(
+								getData.apply(CsvResultHeaders.Place))
 								.map(Integer::parseInt).orElse(null),
-						record.get(CsvResultHeaders.Crew),
-						record.get(CsvResultHeaders.CrewAbbrev),
-						record.get(CsvResultHeaders.Stroke), start,
-						record.get(CsvResultHeaders.Finish),
-						record.get(CsvResultHeaders.Delta),
-						record.get(CsvResultHeaders.AdjTime));
+						getData.apply(CsvResultHeaders.Crew),
+						getData.apply(CsvResultHeaders.CrewAbbrev),
+						getData.apply(CsvResultHeaders.Stroke), start,
+						getData.apply(CsvResultHeaders.Finish),
+						getData.apply(CsvResultHeaders.Delta),
+						getData.apply(CsvResultHeaders.AdjTime));
 				results.computeIfAbsent(cr.getEventCategory(),
 						k -> new ArrayList<>()).add(cr);
 			}
-			// sorted by construction/CSVstructure. But to be sure
-			results.values().forEach(v -> v.sort(null));
-
-			mergeSpecialCategories(results);
-			fixRankAndDelta(results);
-
-			printResults(results);
+			results.replaceAll((k, v) -> v.stream()
+					// Sorted by construction/CSVstructure. But to be sure we sort.
+					.sorted()
+					// Using immutable list to avoid undesired modifications
+					.toList());
+			return results;
 		}
-	}
-
-	private EventId extractEventNum(final CSVRecord record) {
-		return EventId.from(record.get(CsvResultHeaders.EventNum));
 	}
 
 	private void fixRankAndDelta(
@@ -144,7 +174,6 @@ public class LSM {
 					categoryResult.delta = null;
 				} else if (finish == null) {
 					// typically a DNS: do nothing
-
 				} else {
 					// adapt delta compared to first
 					final Duration delta = Duration.between(firstFinish,
@@ -188,18 +217,20 @@ public class LSM {
 
 			// race header
 			final EventCategoryKey res = entry.getKey();
+			final LsmEventCategory lsmEventCategory = LsmEventCategory
+					.parse(res.category());
 			//System.out.printf("-----%nevent category key: %s%n", res);
 			String extraSwissChampionship = "";
-			if (res.isSwissChampionshipCategory()) {
+			if (lsmEventCategory.swissChampionship()) {
 				extraSwissChampionship = " 🏆🇨🇭";
 			}
-			printHelper.printRaceHeader(res.toStandardCategory()
+			printHelper.printRaceHeader(toStandardCategory(lsmEventCategory)
 					+ extraSwissChampionship + " (course " + res.event() + ", "
 					+ getStartTime(resCat.get(0).start) + ")");
 
 			// race results
 			final int nbMedals = getNbMedals(resCat.size(),
-					res.isSwissChampionshipCategory());
+					lsmEventCategory.swissChampionship());
 			for (final CategoryResult cr : resCat) {
 				final String medals = getMedal(cr.categoryRank, nbMedals);
 				printHelper.printResultRow(cr.categoryRank,
@@ -231,6 +262,15 @@ public class LSM {
 		return RACE_TIME_FORMATTER.format(time);
 	}
 
+	public static String toStandardCategory(
+			final LsmEventCategory lsmEventCategory) {
+		final String res = lsmEventCategory.toString();
+		if (!lsmEventCategory.swissChampionship()) {
+			return res;
+		}
+		return res.substring(0, res.length() - 1);
+	}
+
 	// duplicate/merge some special categories to have correct result
 	private void mergeSpecialCategories(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
@@ -238,41 +278,119 @@ public class LSM {
 		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : new HashSet<>(
 				results.entrySet())) {
 			final EventCategoryKey eventCategoryKey = entry.getKey();
-			// FIXME handle case of masters that should be merged too, but only for CH champ categories ?!?
-			if (eventCategoryKey.isSwissChampionshipCategory()) {
-				// add it to the corresponding non-swiss championship category
-				final String standardCategory = eventCategoryKey
-						.toStandardCategory();
-				final List<List<CategoryResult>> standardRes = results
-						.entrySet().stream().filter(e -> {
-							final EventCategoryKey key = e.getKey();
-							return standardCategory.equals(key.category())
-									&& Objects.equals(
-											eventCategoryKey.event().emoji(),
-											key.event().emoji());
-						}).map(e -> e.getValue()).toList();
-				final List<CategoryResult> crs;
-				if (standardRes.isEmpty()) {
+			//System.out.printf("Processing %s%n", eventCategoryKey);
+			final LsmEventCategory lsmEventCategory = LsmEventCategory
+					.parse(eventCategoryKey.category());
+
+			mergeSwissChampionshipCategoryResultsIntoStandardOnes(results,
+					eventCategoryKey,
+					lsmEventCategory,
+					entry.getValue());
+
+			mergeMasterCategoryIntoStandardCategoryForOpen(results,
+					eventCategoryKey,
+					lsmEventCategory,
+					entry.getValue());
+		}
+
+		// delete possibly empty results
+		results.entrySet().removeIf(e -> e.getValue().isEmpty());
+	}
+
+	private void mergeSwissChampionshipCategoryResultsIntoStandardOnes(
+			final SortedMap<EventCategoryKey, List<CategoryResult>> results,
+			final EventCategoryKey eventCategoryKey,
+			final LsmEventCategory lsmEventCategory,
+			final List<CategoryResult> categoryResultsBase) {
+		// FIXME handle case of masters that should be merged too, but only for CH champ categories ?!?
+		if (lsmEventCategory.swissChampionship()) {
+			// add it to the corresponding non-swiss championship category
+			final String standardCategory = toStandardCategory(
+					lsmEventCategory);
+			final List<Entry<EventCategoryKey, List<CategoryResult>>> standardRes = results
+					.entrySet().stream().filter(e -> {
+						final EventCategoryKey key = e.getKey();
+						return standardCategory.equals(key.category())
+								&& Objects.equals(
+										eventCategoryKey.event().emoji(),
+										key.event().emoji());
+					}).toList();
+			final List<CategoryResult> crs;
+			final EventCategoryKey eckToUse;
+			if (standardRes.isEmpty()) {
+				System.out.printf(
+						"Info: aucune catégorie standard trouvée pour '%s'%n",
+						eventCategoryKey.category());
+				// create corresponding category
+				eckToUse = new EventCategoryKey(eventCategoryKey.event(),
+						standardCategory);
+				crs = List.of();
+			} else if (standardRes.size() > 1) {
+				throw new RuntimeException("Found " + standardRes.size()
+						+ " results while expecting only one for "
+						+ eventCategoryKey);
+			} else {
+				final Entry<EventCategoryKey, List<CategoryResult>> entry2 = standardRes
+						.get(0);
+				eckToUse = entry2.getKey();
+				crs = entry2.getValue();
+				System.out.printf(
+						"Info: fusion de la catégorie '%s' dans la catégorie standard '%s'%n",
+						eventCategoryKey.category(),
+						eckToUse.category());
+			}
+			// we need to (deep-)copy each value since they will be modified
+			final List<CategoryResult> categoryResults = Stream
+					.concat(crs.stream(), categoryResultsBase.stream())
+					// actual copy action
+					.map(CategoryResult::new)
+					.sorted(Comparator.comparing(cr -> cr.eventRank,
+							Comparator.nullsLast(Comparator.naturalOrder())))
+					.toList();
+			results.put(eckToUse, categoryResults);
+		}
+	}
+
+	// Cas particulier: pour l'open (LSM uniquement, pas championnats CH), les courses masters sont fusionnées avec les seniors
+	// La clé des courses fusionnées est celle de la course sans Master
+	private void mergeMasterCategoryIntoStandardCategoryForOpen(
+			final SortedMap<EventCategoryKey, List<CategoryResult>> results,
+			final EventCategoryKey eventCategoryKey,
+			final LsmEventCategory lsmEventCategory,
+			final List<CategoryResult> categoryResults) {
+		if (lsmEventCategory.open()) {
+			final LsmEventCategory mergedLsmEventCategory = lsmEventCategory
+					.withAgeCategory(AgeCategory.SENIOR);
+			if (!mergedLsmEventCategory.equals(lsmEventCategory)) {
+				// create corresponding standard category
+				final EventCategoryKey seniorCategoryKey = new EventCategoryKey(
+						eventCategoryKey.event(),
+						mergedLsmEventCategory.toString());
+
+				// merge only if both master and standard age category exists
+				final List<CategoryResult> standardCategoryResults = results
+						.get(seniorCategoryKey);
+				if (standardCategoryResults != null) {
 					System.out.printf(
-							"Info: no standard category found for %s%n",
-							eventCategoryKey);
-					// create corresponding category
-					final EventCategoryKey eck = new EventCategoryKey(
-							eventCategoryKey.event(), standardCategory);
-					crs = new ArrayList<>();
-					results.put(eck, crs);
-				} else if (standardRes.size() > 1) {
-					throw new RuntimeException("Found " + standardRes.size()
-							+ " results while expecting only one for "
-							+ eventCategoryKey);
+							"Info: fusion de la catégorie '%s' dans '%s'%n",
+							lsmEventCategory,
+							mergedLsmEventCategory);
+					final List<CategoryResult> mergedResults = Stream
+							.concat(standardCategoryResults.stream(),
+									categoryResults.stream())
+							.sorted(Comparator.comparing(cr -> cr.eventRank,
+									Comparator.nullsLast(
+											Comparator.naturalOrder())))
+							.toList();
+					results.put(seniorCategoryKey, mergedResults);
+					// removal duplicate entry due to copy
+					results.remove(eventCategoryKey);
 				} else {
-					crs = standardRes.get(0);
+					System.out.printf(
+							"Info: pas de fusion de la catégorie '%s' dans '%s' puisque la catégorie senior n'existe pas%n",
+							lsmEventCategory,
+							mergedLsmEventCategory);
 				}
-				// we need to (deep-)copy each value since they will be modified
-				entry.getValue().stream().map(CategoryResult::new)
-						.forEachOrdered(crs::add);
-				crs.sort(Comparator.comparing(cr -> cr.eventRank,
-						Comparator.nullsLast(Comparator.naturalOrder())));
 			}
 		}
 	}
@@ -301,10 +419,6 @@ public class LSM {
 		// LSM
 		// 3 medals are given, but the last one must not receive a medal
 		return Math.min(Math.max(0, nbParticipants - 1), 3);
-	}
-
-	static final boolean isSwissChampionship(final String category) {
-		return category.endsWith("*");
 	}
 
 }

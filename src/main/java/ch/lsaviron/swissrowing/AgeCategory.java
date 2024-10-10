@@ -2,7 +2,8 @@ package ch.lsaviron.swissrowing;
 
 public enum AgeCategory {
 
-	STANDARD(""),
+	/** The default, standard age category. */
+	SENIOR(""),
 	U19("U19"),
 	MASTER("M");
 

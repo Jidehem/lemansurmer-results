@@ -68,10 +68,6 @@ class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 				.compare(this, o);
 	}
 
-	final boolean isSwissChampionship() {
-		return LSM.isSwissChampionship(category);
-	}
-
 	EventCategoryKey getEventCategory() {
 		return new EventCategoryKey(event, category);
 	}

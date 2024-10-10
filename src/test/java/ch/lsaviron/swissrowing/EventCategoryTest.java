@@ -10,7 +10,7 @@ class EventCategoryTest {
 	@Test
 	final void testParseM1x() {
 		final EventCategory eventCategory = EventCategory.parse("M 1x");
-		assertEquals(new EventCategory(AgeCategory.STANDARD, SexCategory.MEN,
+		assertEquals(new EventCategory(AgeCategory.SENIOR, SexCategory.MEN,
 				RowingCategory.CLASSIC, 1, OarCategory.DOUBLE_SCULL, false),
 				eventCategory);
 	}

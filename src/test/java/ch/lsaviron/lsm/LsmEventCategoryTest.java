@@ -18,7 +18,7 @@ class LsmEventCategoryTest {
 		final LsmEventCategory eventCategory = LsmEventCategory.parse("M 1x");
 		assertEquals(
 				new LsmEventCategory(false,
-						new EventCategory(AgeCategory.STANDARD, SexCategory.MEN,
+						new EventCategory(AgeCategory.SENIOR, SexCategory.MEN,
 								RowingCategory.CLASSIC, 1,
 								OarCategory.DOUBLE_SCULL, false),
 						false),
@@ -44,7 +44,7 @@ class LsmEventCategoryTest {
 				.parse("Open W 8+");
 		assertEquals(
 				new LsmEventCategory(true,
-						new EventCategory(AgeCategory.STANDARD,
+						new EventCategory(AgeCategory.SENIOR,
 								SexCategory.WOMEN, RowingCategory.CLASSIC, 8,
 								OarCategory.SINGLE_SCULL, true),
 						false),

@@ -11,14 +11,8 @@ record EventCategoryKey(EventId event, String category)
 				.thenComparing(EventCategoryKey::category).compare(this, o);
 	}
 
-	public String toStandardCategory() {
-		if (!isSwissChampionshipCategory()) {
-			return category;
-		}
-		return category.substring(0, category.length() - 1);
+	public EventCategoryKey withCategory(final String category) {
+		return new EventCategoryKey(event, category);
 	}
 
-	final boolean isSwissChampionshipCategory() {
-		return LSM.isSwissChampionship(category);
-	}
 }

@@ -127,4 +127,8 @@ public record EventCategory(AgeCategory age, SexCategory sex,
 		return new EventCategory(age, sex, rowing, rowers, oar, coxed);
 	}
 
+	public EventCategory withAgeCategory(final AgeCategory ageCategory) {
+		return new EventCategory(ageCategory, sex, rowing, rowers, oar, coxed);
+	}
+
 }

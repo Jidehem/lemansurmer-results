@@ -1,9 +1,9 @@
 package ch.lsaviron.lsm;
 
 import java.util.Comparator;
+import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-
+import ch.lsaviron.swissrowing.AgeCategory;
 import ch.lsaviron.swissrowing.EventCategory;
 
 public record LsmEventCategory(boolean open, EventCategory eventCategory,
@@ -13,39 +13,39 @@ public record LsmEventCategory(boolean open, EventCategory eventCategory,
 
 	private static final String SWISS_CHAMPIONSHIP_CATEGORY = "*";
 
-	public static final ImmutableList<LsmEventCategory> EVENT_CATEGORIES = ImmutableList
-			.of(parse("M C1x"),
-					parse("M C1x*"),
-					parse("M C2x"),
-					parse("M C4x+"),
-					parse("Mix C2x"),
-					parse("Mix C2x*"),
-					parse("Mix C4x+"),
-					parse("MM C1x"),
-					parse("MM C2x"),
-					parse("MM C4x+"),
-					parse("MMix C2x"),
-					parse("MW C2x"),
-					parse("MW C4x+"),
-					parse("Open M C1x"),
-					parse("Open M C2x"),
-					parse("Open Mix C4x+"),
-					parse("Open MM C1x"),
-					parse("Open MM C4x+"),
-					parse("Open MMix C2x"),
-					parse("Open MMix C4x+"),
-					parse("Open MW C4x+"),
-					parse("Open W C4x+"),
-					parse("U19M C1x*"),
-					parse("U19M C2x"),
-					parse("U19M C4x+"),
-					parse("U19Mix C2x*"),
-					parse("U19W C1x*"),
-					parse("U19W C2x"),
-					parse("U19W C4x+"),
-					parse("W C1x*"),
-					parse("W C2x"),
-					parse("W C4x+"));
+	public static final List<LsmEventCategory> EVENT_CATEGORIES = List.of(
+			parse("M C1x"),
+			parse("M C1x*"),
+			parse("M C2x"),
+			parse("M C4x+"),
+			parse("Mix C2x"),
+			parse("Mix C2x*"),
+			parse("Mix C4x+"),
+			parse("MM C1x"),
+			parse("MM C2x"),
+			parse("MM C4x+"),
+			parse("MMix C2x"),
+			parse("MW C2x"),
+			parse("MW C4x+"),
+			parse("Open M C1x"),
+			parse("Open M C2x"),
+			parse("Open Mix C4x+"),
+			parse("Open MM C1x"),
+			parse("Open MM C4x+"),
+			parse("Open MMix C2x"),
+			parse("Open MMix C4x+"),
+			parse("Open MW C4x+"),
+			parse("Open W C4x+"),
+			parse("U19M C1x*"),
+			parse("U19M C2x"),
+			parse("U19M C4x+"),
+			parse("U19Mix C2x*"),
+			parse("U19W C1x*"),
+			parse("U19W C2x"),
+			parse("U19W C4x+"),
+			parse("W C1x*"),
+			parse("W C2x"),
+			parse("W C4x+"));
 
 	public static final Comparator<LsmEventCategory> BY_EXPECTED_SPEED_COMPARATOR = Comparator
 			.comparing(LsmEventCategory::eventCategory,
@@ -87,4 +87,10 @@ public record LsmEventCategory(boolean open, EventCategory eventCategory,
 				EventCategory.parse(raw.substring(startIdx, endIdx)),
 				swissChampionship);
 	}
+
+	public LsmEventCategory withAgeCategory(final AgeCategory ageCategory) {
+		return new LsmEventCategory(open,
+				eventCategory.withAgeCategory(ageCategory), swissChampionship);
+	}
+
 }
