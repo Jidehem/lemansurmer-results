@@ -71,4 +71,15 @@ class CategoryResult implements Comparable<CategoryResult>, Cloneable {
 	EventCategoryKey getEventCategory() {
 		return new EventCategoryKey(event, category);
 	}
+
+	@Override
+	public String toString() {
+		return "CategoryResult [event=" + event + ", eventName=" + eventName
+				+ ", eventRank=" + eventRank + ", crew=" + crew
+				+ ", crewAbbrev=" + crewAbbrev + ", category=" + category
+				+ ", start=" + start + ", finish=" + finish + ", delta=" + delta
+				+ ", categoryRank=" + categoryRank + ", adjTime=" + adjTime
+				+ "]";
+	}
+
 }

@@ -15,8 +15,10 @@ enum CsvResultHeaders {
 	Stroke,
 	Start,
 	Finish,
-	Bouée_A,
-	Bouée_C,
+	// TODO nice-to-have allow adding/removing intermediate times dynamically ?
+	// 2023 only
+	//Bouée_A,
+	//Bouée_C,
 	RawTime,
 	PenaltyCode,
 	AdjTime,

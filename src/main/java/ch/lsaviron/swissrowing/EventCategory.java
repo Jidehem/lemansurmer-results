@@ -1,6 +1,7 @@
 package ch.lsaviron.swissrowing;
 
 import java.util.Comparator;
+import java.util.Locale;
 
 public record EventCategory(AgeCategory age, SexCategory sex,
 		RowingCategory rowing, int rowers, OarCategory oar, boolean coxed) {
@@ -51,9 +52,12 @@ public record EventCategory(AgeCategory age, SexCategory sex,
 		// oar
 		OarCategory oar = null;
 		// decreasing enum values search since the default, empty value comes first
+		// allow parsing oar category in upper-case or lower-case
+		final String rawMinusCoxedLC = raw.substring(startIdx, endIdx)
+				.toLowerCase(Locale.ROOT);
 		for (int i = OarCategory.values().length - 1; i >= 0; i--) {
 			final OarCategory oc = OarCategory.values()[i];
-			if (raw.substring(startIdx, endIdx).endsWith(oc.code)) {
+			if (rawMinusCoxedLC.endsWith(oc.code)) {
 				oar = oc;
 				break;
 			}

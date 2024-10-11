@@ -79,7 +79,7 @@ public class LSM {
 		new LSM(resultsFromCrewTimerCsv, printMode).processResults();
 	}
 
-	private String normalize(final String s) {
+	public static String normalize(final String s) {
 		if (s == null) {
 			return null;
 		}
@@ -144,8 +144,14 @@ public class LSM {
 						getData.apply(CsvResultHeaders.Finish),
 						getData.apply(CsvResultHeaders.Delta),
 						getData.apply(CsvResultHeaders.AdjTime));
-				results.computeIfAbsent(cr.getEventCategory(),
-						k -> new ArrayList<>()).add(cr);
+				try {
+					results.computeIfAbsent(cr.getEventCategory(),
+							k -> new ArrayList<>()).add(cr);
+				} catch (final RuntimeException e) {
+					// add more context
+					System.err.printf("Error while parsing %s%n", cr);
+					throw e;
+				}
 			}
 			results.replaceAll((k, v) -> v.stream()
 					// Sorted by construction/CSVstructure. But to be sure we sort.

@@ -18,16 +18,26 @@ public record EventId(String emoji, int id) {
 			.thenComparing(EventId::id,
 					Comparator.nullsFirst(Comparator.naturalOrder()));
 
+	// TODO nice-to-have make this more generic across years ?
 	public static enum Race {
 
 		// declaration order matters
+		// 2023 race IDs
 		ANEMONE("🪸"),
 		BERNARD_LHERMITE("🐚"),
 		CALAMAR("🦑"),
-		DORADE("🐟"),
+		DORADE_OR_ANCHOIS("🐟"),
 		// multiple encoding found for etoile character. 2b50 and fe0f
 		ETOILE_DE_MER("\u2b50"),
-		ETOILE_DE_MER_B("\u2b50\u2b50");
+		ETOILE_DE_MER_B("\u2b50\u2b50"),
+
+		// 2024 race IDs
+		LAMANTIN("🦭"),
+		ECREVISSE("🦞"),
+		MANCHOT("🐧"),
+		//ANCHOIS("🐟"), => duplicate from 2023 => adapting 2023 name
+		NARVAL("🦄"),
+		NARVAL_B("🦄🦄"),;
 
 		private static final Map<String, Race> REVERSE = Maps
 				.uniqueIndex(Arrays.asList(Race.values()), Race::getEmoji);
@@ -39,7 +49,7 @@ public record EventId(String emoji, int id) {
 				throw new IllegalArgumentException(
 						"blank emoji is not allowed");
 			}
-			this.emoji = emoji;
+			this.emoji = LSM.normalize(emoji);
 		}
 
 		public static Race fromEmoji(final String emoji) {
@@ -47,11 +57,14 @@ public record EventId(String emoji, int id) {
 				// special case to allow null emoji
 				return null;
 			}
-			final Race res = REVERSE.get(emoji);
+			final Race res = REVERSE.get(LSM.normalize(emoji));
 			if (res == null) {
 				// debug infos
 				System.err.println("emoji chars");
 				emoji.chars().forEach(c -> System.err.printf("%x%n", c));
+				System.err.println("normalized emoji chars");
+				LSM.normalize(emoji).chars()
+						.forEach(c -> System.err.printf("%x%n", c));
 
 				throw new IllegalArgumentException(
 						"Emoji " + emoji + " is not a known race marker");
