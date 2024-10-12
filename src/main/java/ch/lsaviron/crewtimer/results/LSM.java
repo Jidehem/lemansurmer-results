@@ -10,34 +10,48 @@ import java.io.Reader;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import ch.lsaviron.lsm.LsmEventCategory;
 import ch.lsaviron.swissrowing.AgeCategory;
 
 /**
- * @author Jean-David Maillefer, 2023
+ * @author Jean-David Maillefer, 2023-2024
  */
 public class LSM {
+
+	public static int currentYear = 2024;
+
+	private static final Map<Integer, List<String>> INTERMEDIATE_POINTS_CSV_HEADERS_PER_YEAR = Map
+			.of(2023, List.of("Bouée_A", "Bouée_C"));
 
 	private static final DateTimeFormatter DELTA_FORMATTER = DateTimeFormatter
 			.ofPattern("mm:ss.S");
@@ -53,6 +67,17 @@ public class LSM {
 			final PrintMode printMode) {
 		this.resultsFromCrewTimerCsv = resultsFromCrewTimerCsv;
 		this.printMode = printMode;
+	}
+
+	/**
+	 * Set the current year to the current system year.
+	 */
+	public static void resetCurrentYear() {
+		currentYear = LocalDate.now().getYear();
+	}
+
+	public static void setCurrentYear(final int year) {
+		currentYear = year;
 	}
 
 	public static void main(final String... args) throws Exception {
@@ -96,14 +121,24 @@ public class LSM {
 
 	private SortedMap<EventCategoryKey, List<CategoryResult>> readRawResultsFromCsv()
 			throws IOException, FileNotFoundException {
-		CSVParser parser;
-		// read CSV:
-		try (Reader in = new FileReader(resultsFromCrewTimerCsv)) {
+		// manage headers: merge static ones with dynamic ones
+		final List<String> intermediatePointsHeaders = INTERMEDIATE_POINTS_CSV_HEADERS_PER_YEAR
+				.getOrDefault(currentYear, List.of());
+		final List<String> headers1 = Arrays.stream(CsvResultHeaders.values())
+				.map(h -> h.name()).toList();
+		final int splitIndex = CsvResultHeaders.RawTime.ordinal();
+		final String[] headers = Stream
+				.concat(Stream.concat(headers1.subList(0, splitIndex).stream(),
+						intermediatePointsHeaders.stream()),
+						headers1.subList(splitIndex, headers1.size()).stream())
+				.toArray(String[]::new);
+
+		// read CSV
+		try (final Reader in = new FileReader(resultsFromCrewTimerCsv)) {
 			final CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
 					.setAllowMissingColumnNames(false).setSkipHeaderRecord(true)
-					.setNullString("").setHeader(CsvResultHeaders.class)
-					.build();
-			parser = csvFormat.parse(in);
+					.setNullString("").setHeader(headers).build();
+			final CSVParser parser = csvFormat.parse(in);
 			//System.out.println(parser.getHeaderNames());
 
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results = new TreeMap<>();
@@ -115,7 +150,8 @@ public class LSM {
 				final Function<CsvResultHeaders, String> getData = header -> normalize(
 						record.get(header));
 				//System.out.println(record);
-				if (record.size() != CsvResultHeaders.values().length) {
+				if (record.size() != CsvResultHeaders.values().length
+						+ intermediatePointsHeaders.size()) {
 					throw new IOException(String.format(
 							"Inconsistent number of fields in CSV line %d (%s)%nCheck that data in %s is consistent"
 									+ " and/or class %s contains all header names",
@@ -131,6 +167,13 @@ public class LSM {
 					lastStart = start;
 				}
 
+				// intermediate times
+				final Map<String, String> intermediateTimesByPoint = Collections
+						.unmodifiableMap(intermediatePointsHeaders.stream()
+								.collect(HashMap::new,
+										(m, v) -> m.put(v, record.get(v)),
+										HashMap::putAll));
+
 				// test delta bouées
 				final var cr = new CategoryResult(
 						EventId.from(getData.apply(CsvResultHeaders.EventNum)),
@@ -141,9 +184,12 @@ public class LSM {
 						getData.apply(CsvResultHeaders.Crew),
 						getData.apply(CsvResultHeaders.CrewAbbrev),
 						getData.apply(CsvResultHeaders.Stroke), start,
+						intermediateTimesByPoint,
 						getData.apply(CsvResultHeaders.Finish),
 						getData.apply(CsvResultHeaders.Delta),
 						getData.apply(CsvResultHeaders.AdjTime));
+				// debug infos
+				//System.out.println(cr);
 				try {
 					results.computeIfAbsent(cr.getEventCategory(),
 							k -> new ArrayList<>()).add(cr);
@@ -171,9 +217,23 @@ public class LSM {
 			LocalTime firstFinish = null;
 			for (final CategoryResult categoryResult : crs) {
 				nb++;
-				LocalTime finish = null;
+				LocalTime finishRaw = null;
 				if (StringUtil.isNotBlank(categoryResult.finish)) {
-					finish = LocalTime.parse(categoryResult.finish);
+					finishRaw = LocalTime.parse(categoryResult.finish);
+				}
+				LocalTime finish = null;
+				if (StringUtil.isNotBlank(categoryResult.adjTime)
+						&& !categoryResult.adjTime.equals("DNS")
+						&& !categoryResult.adjTime.equals("DNF")) {
+					finish = LocalTime.parse(categoryResult.start)
+							.plus(parseDuration(categoryResult.adjTime));
+					if (finishRaw != null && !finishRaw.equals(finish)) {
+						System.out.printf(
+								"Attention: la fin %s ne correspond pas à la fin ajustée %s (%s)%n",
+								finishRaw,
+								finish,
+								categoryResult);
+					}
 				}
 				if (firstFinish == null) {
 					firstFinish = finish;
@@ -197,6 +257,37 @@ public class LSM {
 				}
 			}
 		}
+	}
+
+	// TODO add unit test
+	@VisibleForTesting
+	static Duration parseDuration(final String time) {
+		final Matcher matcher = Pattern.compile(
+				"(?:([0-9]+):)?([0-9]{1,2}):([0-9]{2})(?:.([0-9]{1,3}))?")
+				.matcher(time);
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException(
+					"Time " + time + " is not a valide time representation");
+		}
+		Duration duration = Duration.ofMinutes(Long.parseLong(matcher.group(2)))
+				.plus(Duration.ofSeconds(Long.parseLong(matcher.group(3))));
+
+		final String groupHours = matcher.group(1);
+		if (StringUtils.isNotEmpty(groupHours)) {
+			duration = duration
+					.plus(Duration.ofHours(Long.parseLong(groupHours)));
+		}
+
+		String groupMillis = matcher.group(4);
+		if (StringUtils.isNotEmpty(groupMillis)) {
+			while (groupMillis.length() < 3) {
+				groupMillis += "0";
+			}
+			duration = duration
+					.plus(Duration.ofMillis(Long.parseLong(groupMillis)));
+		}
+
+		return duration;
 	}
 
 	private void printResults(
@@ -281,8 +372,10 @@ public class LSM {
 	private void mergeSpecialCategories(
 			final SortedMap<EventCategoryKey, List<CategoryResult>> results) {
 		// copy since modified
-		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : new HashSet<>(
-				results.entrySet())) {
+		final TreeSet<Entry<EventCategoryKey, List<CategoryResult>>> entrySet = new TreeSet<>(
+				Entry.comparingByKey());
+		entrySet.addAll(results.entrySet());
+		for (final Entry<EventCategoryKey, List<CategoryResult>> entry : entrySet) {
 			final EventCategoryKey eventCategoryKey = entry.getKey();
 			//System.out.printf("Processing %s%n", eventCategoryKey);
 			final LsmEventCategory lsmEventCategory = LsmEventCategory

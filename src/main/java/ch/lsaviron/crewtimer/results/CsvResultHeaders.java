@@ -6,6 +6,7 @@ package ch.lsaviron.crewtimer.results;
  */
 // Cf. ch.lsaviron.crewtimer.results.LSM#processResults()
 enum CsvResultHeaders {
+
 	EventNum,
 	Event,
 	Place,
@@ -15,12 +16,8 @@ enum CsvResultHeaders {
 	Stroke,
 	Start,
 	Finish,
-	// TODO nice-to-have allow adding/removing intermediate times dynamically ?
-	// 2023 only
-	//Bouée_A,
-	//Bouée_C,
 	RawTime,
 	PenaltyCode,
 	AdjTime,
-	Delta
+	Delta;
 }

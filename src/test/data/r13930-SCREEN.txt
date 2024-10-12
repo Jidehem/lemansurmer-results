@@ -1,0 +1,236 @@
+Info: aucune catégorie standard trouvée pour 'U19W C1x*'
+Info: aucune catégorie standard trouvée pour 'U19Mix C2x*'
+Info: aucune catégorie standard trouvée pour 'U19M C1x*'
+Info: aucune catégorie standard trouvée pour 'M C1X*'
+Info: aucune catégorie standard trouvée pour 'W C1X*'
+Info: aucune catégorie standard trouvée pour 'Mix C2X*'
+Attention: la fin 12:17:36.899 ne correspond pas à la fin ajustée 12:19:36.899 (CategoryResult [event=🦞 7, eventName=- U19 M C1X 🇨🇭🏆, eventRank=4, crew=Club Aviron Vésenaz 5 (Rault Clément), crewAbbrev=CAVEV 5, category=U19M C1x*, start=11:45:00.242, finish=12:17:36.899, delta=05:01.858, categoryRank=null, adjTime=34:36.657])
+Attention: la fin 12:17:36.899 ne correspond pas à la fin ajustée 12:19:36.899 (CategoryResult [event=🦞 7, eventName=- U19 M C1X 🇨🇭🏆, eventRank=4, crew=Club Aviron Vésenaz 5 (Rault Clément), crewAbbrev=CAVEV 5, category=U19M C1x*, start=11:45:00.242, finish=12:17:36.899, delta=05:01.858, categoryRank=null, adjTime=34:36.657])
+Attention: la fin 15:47:20.950 ne correspond pas à la fin ajustée 15:47:50.950 (CategoryResult [event=🐟 15, eventName=- Mix C2X 🇨🇭🏆, eventRank=10, crew=Lausanne Sports Section Aviron 18 ((b) Schmid Ilona, (s) Solomon Ramzi), crewAbbrev=LSA 18, category=MMix C2X, start=15:15:00.182, finish=15:47:20.950, delta=04:26.632, categoryRank=null, adjTime=32:50.768])
+
+U19W C4x+ (course 🦭 1, 10h15)
+--------------------------
+1: 🥇	CAVEV 1	Club Aviron Vésenaz 1 ((b) Bulliard Margaux, (2) Baronijan Ani, (3) Gage Juliette, (s) Arteaga Quisne Liz Mayerli, (c) Fatini del Grande Elena)	30:46.098	
+2: 	RCL 1	Rowing Club Lausanne 1 ((b) Horesjova Vanda, (2) Knobel Elsa, (3) Nielsen Claudia, (s) Stuckey Caelyn, (c) Adra Lilia)	31:30.181	+00:44.0
+
+
+U19W C2x (course 🦭 2, 10h15)
+--------------------------
+1: 🥇	LSA 1	Lausanne Sports Section Aviron 1 ((b) Pavillon Inès, (s) Kopse Noa)	29:14.417	
+2: 	SOL 1	RGM RC Bern / Solothurner RC 1 ((b) Althof Mia Olivia, (s) Misteli Ella)	29:42.261	+00:27.8
+
+
+U19W C1x (course 🦭 3, 10h15)
+--------------------------
+1: 🥇	LSA 3	Lausanne Sports Section Aviron 3 (Ben Moussa Yasmina)	30:56.815	
+2: 🥈	CAVEV 2	Club Aviron Vésenaz 2 (Haymoz Joalina)	31:38.006	+00:41.1
+3: 🥉	LSA 2	Lausanne Sports Section Aviron 2 (Pacaud Anaëlle)	31:53.482	+00:56.6
+4: 	LSA 4	Lausanne Sports Section Aviron 4 (Hihi Inès)	33:00.905	+02:04.0
+
+
+U19W C1x 🏆🇨🇭 (course 🦭 3, 10h15)
+--------------------------
+1: 🥇	LSA 3	Lausanne Sports Section Aviron 3 (Ben Moussa Yasmina)	30:56.815	
+2: 🥈	CAVEV 2	Club Aviron Vésenaz 2 (Haymoz Joalina)	31:38.006	+00:41.1
+3: 🥉	LSA 2	Lausanne Sports Section Aviron 2 (Pacaud Anaëlle)	31:53.482	+00:56.6
+4: 	LSA 4	Lausanne Sports Section Aviron 4 (Hihi Inès)	33:00.905	+02:04.0
+
+
+U19Mix C2x (course 🦭 4, 10h15)
+--------------------------
+1: 🥇	LSA 5	Lausanne Sports Section Aviron 5 ((b) Studer Emilien, (s) Van Dyke Alicia)	27:06.041	
+2: 🥈	SOL 2	Solothurner Ruderclub 2 ((b) Lüthi Anouk, (s) Lüthi Till)	27:09.378	+00:03.3
+3: 🥉	RCL 4	Rowing Club Lausanne 4 ((b) Knobel Fanny, (s) Pakielo Adam)	27:32.605	+00:26.5
+4: 	ERL 1	Ruderclub Erlenbach 1 ((b) Suter Valentin, (s) Scherer Fiona)	28:06.930	+01:00.8
+5: 	CAVEV 3	Club Aviron Vésenaz 3 ((b) Hars Gabriel, (s) Schmid Sienna)	28:07.984	+01:01.9
+6: 	SUR 1	Seeclub Sursee 1 ((b) Kneubühler Morris, (s) Heer Zoé)	28:38.204	+01:32.1
+
+
+U19Mix C2x 🏆🇨🇭 (course 🦭 4, 10h15)
+--------------------------
+1: 🥇	LSA 5	Lausanne Sports Section Aviron 5 ((b) Studer Emilien, (s) Van Dyke Alicia)	27:06.041	
+2: 🥈	SOL 2	Solothurner Ruderclub 2 ((b) Lüthi Anouk, (s) Lüthi Till)	27:09.378	+00:03.3
+3: 🥉	RCL 4	Rowing Club Lausanne 4 ((b) Knobel Fanny, (s) Pakielo Adam)	27:32.605	+00:26.5
+4: 	ERL 1	Ruderclub Erlenbach 1 ((b) Suter Valentin, (s) Scherer Fiona)	28:06.930	+01:00.8
+5: 	CAVEV 3	Club Aviron Vésenaz 3 ((b) Hars Gabriel, (s) Schmid Sienna)	28:07.984	+01:01.9
+6: 	SUR 1	Seeclub Sursee 1 ((b) Kneubühler Morris, (s) Heer Zoé)	28:38.204	+01:32.1
+
+
+U19M C4x+ (course 🦞 5, 11h45)
+--------------------------
+1: 🥇	CAVEV 4	Club Aviron Vésenaz 4 ((b) Khoury Aleksandar, (2) Andrey Romain, (3) Mejia Jan, (s) Velasco Santiago, (c) Dallaturia Marion)	27:29.617	
+2: 🥈	LSA 7	Lausanne Sports Section Aviron 7 ((b) Alvez da Costa Antoine, (2) Ferrari Trecate Gabriele, (3) Gatignol Daniel, (s) Liggi Ulisse Ren, (c) Schaller Adrien)	28:15.916	+00:46.2
+3: 	LSA 6	Lausanne Sports Section Aviron 6 ((b) Adam Evan, (2) Perlet Philip, (3) Schneeberger Matis, (s) Parisi Vadim, (c) Coetsier Aedan)	30:30.176	+03:00.5
+
+
+U19M C2x (course 🦞 6, 11h45)
+--------------------------
+1: 🥇	RCL 5	Rowing Club Lausanne 5 ((b) Rodriguez Miguel, (s) Tayeh Timeo)	27:58.486	
+2: 	LSA 8	Lausanne Sports Section Aviron 8 ((b) Ferrari Trecate Elia Franco, (s) Leal Alexy)	28:06.936	+00:08.4
+
+
+U19M C1x (course 🦞 7, 11h45)
+--------------------------
+1: 🥇	ERL 2	Ruderclub Erlenbach 2 (Fehlmann Gilles)	29:34.799	
+2: 🥈	LSA 10	Lausanne Sports Section Aviron 10 (Edgar Matteo James)	30:27.592	+00:52.7
+3: 🥉	LSA 9	Lausanne Sports Section Aviron 9 (Beck Mathieu)	32:31.486	+02:56.6
+4: 	CAVEV 5	Club Aviron Vésenaz 5 (Rault Clément)	34:36.657	+05:01.8
+
+
+U19M C1x 🏆🇨🇭 (course 🦞 7, 11h45)
+--------------------------
+1: 🥇	ERL 2	Ruderclub Erlenbach 2 (Fehlmann Gilles)	29:34.799	
+2: 🥈	LSA 10	Lausanne Sports Section Aviron 10 (Edgar Matteo James)	30:27.592	+00:52.7
+3: 🥉	LSA 9	Lausanne Sports Section Aviron 9 (Beck Mathieu)	32:31.486	+02:56.6
+4: 	CAVEV 5	Club Aviron Vésenaz 5 (Rault Clément)	34:36.657	+05:01.8
+
+
+M C4x+ (course 🐧 8, 14h00)
+--------------------------
+1: 	STF 1	Saint Fons 1 ((b) Cotte Lionnel, (2) Murat Stéphane, (3) Monet Sebastien, (s) Matrat Nicolas, (c) Corbes Clémentine)	26:13.742	
+
+
+MM C4x+ (course 🐧 8, 14h00)
+--------------------------
+1: 🥇	LSA 11	Lausanne Sports Section Aviron 11 ((b) Ferrini Rolando, (2) Rager Jakob, (3) Fatien Michaël, (s) Maillefer Jean-David, (c) Salomon Ramzi)	26:19.742	
+2: 🥈	CATB 1	C.A. Thonon les Bains 1 ((b) Bousquet  Landry, (2) Vernaz Michel, (3) Ducret Michel, (s) Beal Olivier, (c) Ducret Damien)	26:55.742	+00:36.0
+3: 	RCMB 1	Reial Club Marítim de Barcelona 1 ((b) Bolton Daniel, (2) Marieges Joan, (3) Yepes Agustí, (s) Magarinos Antonio, (c) Helen Giboy)	27:33.742	+01:14.0
+
+
+M C2x (course 🐧 9, 14h00)
+--------------------------
+1: 🥇	SEM 1	RGM SC Sempach / SC Zug 1 ((b) Röösli Roman, (s) Struzina Kurt)	26:25.484	
+2: 🥈	AVG 1	Aviron Grenoblois 1 ((b) Gabriel Antoine, (s) Lesieur Thomas)	26:42.742	+00:17.2
+3: 🥉	LTH 1	Lausanne Sports Section Aviron / C.A. Thonon les Bains 1 ((b) Leinen Simon, (s) Dubouloz Simon)	27:01.742	+00:36.2
+4: 	CATB 2	C.A. Thonon les Bains 2 ((b) Bechet Marc, (s) Dubrulle Loïc)	27:12.742	+00:47.2
+
+
+MM C2x (course 🐧 9, 14h00)
+--------------------------
+1: 🥇	SNHS 1	Société Nautique de la Haute Seine 1 ((b) Chailloux Nicolas, (s) Chailloux Olivier)	34:22.742	
+2: 	STF 2	Saint Fons 2 ((b) Gricourt Alain, (s) Bonte Sébastien)	36:15.742	+01:53.0
+
+
+M C1x 🏆🇨🇭 (course 🐧 10, 14h00)
+--------------------------
+1: 🥇	ERL 3	Ruderclub Erlenbach 3 (Soldo Mattia)	32:10.742	
+2: 🥈	ERL 4	Ruderclub Erlenbach 4 (Biner Jonas)	33:06.742	+00:56.0
+
+
+M C1x (course 🐧 10, 14h00)
+--------------------------
+1: 🥇	ERL 3	Ruderclub Erlenbach 3 (Soldo Mattia)	32:10.742	
+2: 	ERL 4	Ruderclub Erlenbach 4 (Biner Jonas)	33:06.742	+00:56.0
+
+
+MM C1x (course 🐧 10, 14h00)
+--------------------------
+1: 	SNG 1	Soc. Nautique Genève S. Aviron 1 (Nguyen Jean-George)	36:34.742	
+
+
+Mix C4x+ (course 🐧 11, 14h00)
+--------------------------
+1: 🥇	LWL 1	Lausanne Sports Section Aviron / Western University Boat Club / Club nautique de Lorient 1 ((b) Romain Loup, (2) Fanny Mossière, (3) Thornton Jane, (s) Lasorak Natacha, (c) Minger Marie)	27:08.742	
+2: 	UNI 1	Aviron Unil-Epfl 1 ((b) Saix Louis, (2) Julien Mathilde, (3) Ares Oliveira Sofia, (s) Gant Leonardo, (c) Pibiri Elena)	29:38.742	+02:30.0
+
+
+W C2x (course 🐟 13, 15h15)
+--------------------------
+1: 🥇	CNL 1	Centre Nautique de Lorient 1 ((b) Bechter Brigitte, (s) Lasorak Natacha)	34:00.547	
+2: 	RCL 6	Rowing Club Lausanne 6 ((b) Horejsova Tereza, (s) Pierson Marine)	36:21.251	+02:20.7
+
+
+W C1x 🏆🇨🇭 (course 🐟 14, 15h15)
+--------------------------
+1: 🥇	SUR 2	Seeclub Sursee 2 (Heer Zoé)	32:28.023	
+2: 🥈	LSA 14	Lausanne Sports Section Aviron 14 (Cretegny Yasmina)	32:29.986	+00:01.9
+3: 🥉	LSA 13	Lausanne Sports Section Aviron 13 (Berner Arielle)	32:37.251	+00:09.2
+
+
+W C1x (course 🐟 14, 15h15)
+--------------------------
+1: 🥇	SUR 2	Seeclub Sursee 2 (Heer Zoé)	32:28.023	
+2: 🥈	LSA 14	Lausanne Sports Section Aviron 14 (Cretegny Yasmina)	32:29.986	+00:01.9
+3: 	LSA 13	Lausanne Sports Section Aviron 13 (Berner Arielle)	32:37.251	+00:09.2
+
+
+MMix C2x (course 🐟 15, 15h15)
+--------------------------
+1: 🥇	LSA 17	Lausanne Sports Section Aviron 17 ((b) Fatien Michaël, (s) Dupraz Denise)	32:49.232	
+2: 	LSA 18	Lausanne Sports Section Aviron 18 ((b) Schmid Ilona, (s) Solomon Ramzi)	32:50.768	+00:01.5
+
+
+Mix C2x 🏆🇨🇭 (course 🐟 15, 15h15)
+--------------------------
+1: 🥇	ERL 5	Ruderclub Erlenbach 5 ((b) Raschle Yannick, (s) Hatt Ayana)	28:24.136	
+2: 🥈	LSA 16	Lausanne Sports Section Aviron 16 ((b) Clément Nathan, (s) Bianchi Sarah)	28:30.357	+00:06.2
+3: 🥉	LSA 15	Lausanne Sports Section Aviron 15 ((b) Carr Benjamin, (s) Rol Frédérique)	28:35.972	+00:11.8
+4: 	LSA 19	Lausanne Sports Section Aviron 19 ((b) Loup Romain, (s) Minger Marie)	29:18.417	+00:54.2
+5: 	CATB 3	C.A. Thonon les Bains 3 ((b) Ducret Damien, (s) Roger Anne Laure)	29:29.909	+01:05.7
+6: 	RCL 7	Rowing Club Lausanne 7 ((b) Schalbetter Loïc, (s) Hornes Natalia)	29:42.654	+01:18.5
+7: 	ERL 6	Ruderclub Erlenbach 6 ((b) Locher Felix, (s) Loepfe Annina)	29:43.345	+01:19.2
+8: 	STF 4	Saint Fons 4 ((b) Matrat Nicolas, (s) Corbes Clémentine)	31:37.498	+03:13.3
+
+
+Mix C2x (course 🐟 15, 15h15)
+--------------------------
+1: 🥇	ERL 5	Ruderclub Erlenbach 5 ((b) Raschle Yannick, (s) Hatt Ayana)	28:24.136	
+2: 🥈	LSA 16	Lausanne Sports Section Aviron 16 ((b) Clément Nathan, (s) Bianchi Sarah)	28:30.357	+00:06.2
+3: 🥉	LSA 15	Lausanne Sports Section Aviron 15 ((b) Carr Benjamin, (s) Rol Frédérique)	28:35.972	+00:11.8
+4: 	LSA 19	Lausanne Sports Section Aviron 19 ((b) Loup Romain, (s) Minger Marie)	29:18.417	+00:54.2
+5: 	CATB 3	C.A. Thonon les Bains 3 ((b) Ducret Damien, (s) Roger Anne Laure)	29:29.909	+01:05.7
+6: 	RCL 7	Rowing Club Lausanne 7 ((b) Schalbetter Loïc, (s) Hornes Natalia)	29:42.654	+01:18.5
+7: 	ERL 6	Ruderclub Erlenbach 6 ((b) Locher Felix, (s) Loepfe Annina)	29:43.345	+01:19.2
+8: 	STF 4	Saint Fons 4 ((b) Matrat Nicolas, (s) Corbes Clémentine)	31:37.498	+03:13.3
+
+
+Open M C4x+ (course 🦄 16, 16h30)
+--------------------------
+1: 🥇	CATB 4	C.A. Thonon les Bains 4 ((b) Vernaz Michel, (2) Bechet Marc, (3) Ducret Michel, (s) Dubrulle Loïc, (c) Ducret Damien)	27:22.064	
+2: 	CNCB 1	Club nautique de Chambéry le Bourget 1 ((b) Guerci Éric, (2) Gache Florent, (3) Louvetin Sylvain, (s) Morin Gil, (c) Marsat Jérôme)	28:51.727	+01:29.6
+
+
+Open M C2x (course 🦄 17, 16h30)
+--------------------------
+1: 🥇	CATB 5	C.A. Thonon les Bains 5 ((b) Beal Olivier, (s) Bousquet Landry)	28:43.171	
+2: 🥈	RCMB 3	Reial Club Marítim de Barcelona 3 ((b) Bolton Daniel, (s) Yepes Agustí)	30:23.555	+01:40.3
+3: 🥉	SOL 3	Solothurner Ruderclub 3 ((b) Soltermann Elijas, (s) Fluri Remo)	31:56.135	+03:12.9
+4: 	SNHS 2	Société Nautique de la Haute Seine 2 ((b) Chailloux Nicolas, (s) Chailloux Olivier)	34:04.407	+05:21.2
+5: 	NANA 1	Nana Ouchy 1 ((b) Christinat Georges, (s) Galusser Alain)	39:50.472	+11:07.3
+
+
+Open M C1x (course 🦄 18, 16h30)
+--------------------------
+1: 🥇	AVG 2	Aviron Grenoblois 2 (Vinter Laurent)	31:38.751	
+2: 🥈	LSA 24	Lausanne Sports Section Aviron 24 (Delahaye Charles)	31:59.324	+00:20.5
+3: 🥉	RCMB 4	Reial Club Marítim de Barcelona 4 (Marieges Joan)	32:14.167	+00:35.4
+4: 	RCL 8	Rowing Club Lausanne 8 (Werly Rémy)	35:39.506	+04:00.7
+5: 	SCA 1	Società Canottieri Audax 1 (Gotta Franco)	38:54.965	+07:16.2
+
+
+Open Mix C4x+ (course 🦄 19, 16h30)
+--------------------------
+1: 🥇	NANA 2	Nana Ouchy 2 ((b) Manker Lorenz, (2) Cordeau Eliot, (3) Blanchot Yoann, (s) Rodilla Ramirez Pilar Natalia, (c) Wegmann Chloé)	29:19.060	
+2: 🥈	FRCM 1	Forward Rowing Club Morges 1 ((b) Savoretti Antonella, (2) Petignat Philippe, (3) Reinhard Michael, (s) Brot Catherine, (c) Paquier Mathias)	30:49.657	+01:30.5
+3: 🥉	LSA 20	Lausanne Sports Section Aviron 20 ((b) Jequier Elise, (2) Bretin Isabelle, (3) von Dach Olivier, (s) Duruz Aline, (c) Ferrini Rolando)	30:57.725	+01:38.6
+4: 	CAV 1	Club Aviron Vevey 1 ((b) Pilet François, (2) Romaguera Jordi, (3) Centanni Damaris, (s) Fremond Sandrine, (c) Harwood Emma)	33:50.809	+04:31.7
+
+
+Open W C4x+ (course 🦄 20, 16h30)
+--------------------------
+1: 🥇	UNI 2	Aviron Unil-Epfl 2 ((b) Coté Gendreau Alice, (2) Saul  Mélanie, (3) Salles Juliette, (s) Galimberti Clara, (c) Pibiri Elena)	29:54.682	
+2: 🥈	LSA 21	Lausanne Sports Section Aviron 21 ((b) Attinger Lucia, (2) Pahud Loyse, (3) Rosende Magdalena, (s) Uehlinger Silvia, (c) Dupraz Denise)	34:41.137	+04:46.4
+3: 	LSA 22	Lausanne Sports Section Aviron 22 ((b) Lewinski-Grzesiak Katarzyna, (2) Mariaux Sandrine, (3) Guezennec Helena, (s) Dufour Delphine, (c) Hafner Yves)	37:53.745	+07:59.0
+
+
+Open W C2x (course 🦄 21, 16h30)
+--------------------------
+1: 🥇	LSA 23	Lausanne Sports Section Aviron 23 ((b) Pannatier Yannic, (s) Brugnatelli Valentina)	35:59.014	
+2: 	SCA 2	Società Canottieri Audax 2 ((b) Figini Elena, (s) Della Casa Monica)	39:15.861	+03:16.8
+
+
+Open Mix C2x (course 🦄 23, 16h30)
+--------------------------
+1: 🥇	RCMB 2	Reial Club Marítim de Barcelona 2 ((b) Expósito Eva, (s) Magarinos Antonio)	33:08.883	
+2: 	FRCM 2	Forward Rowing Club Morges 2 ((b) Freymond Anne, (s) Gonvers Cédric)	34:39.352	+01:30.4
+

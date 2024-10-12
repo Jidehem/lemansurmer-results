@@ -1,14 +1,16 @@
-Info: aucune catégorie standard trouvée pour 'W C1x*'
-Info: fusion de la catégorie 'Mix C2x*' dans la catégorie standard 'Mix C2x'
-Info: aucune catégorie standard trouvée pour 'U19M C1x*'
-Info: fusion de la catégorie 'Open MW C4x+' dans 'Open W C4x+'
-Info: aucune catégorie standard trouvée pour 'U19W C1x*'
-Info: fusion de la catégorie 'Open MM C1x' dans 'Open M C1x'
-Info: pas de fusion de la catégorie 'Open MMix C2x' dans 'Open Mix C2x' puisque la catégorie senior n'existe pas
-Info: fusion de la catégorie 'M C1x*' dans la catégorie standard 'M C1x'
 Info: aucune catégorie standard trouvée pour 'U19Mix C2x*'
+Info: aucune catégorie standard trouvée pour 'U19W C1x*'
+Info: aucune catégorie standard trouvée pour 'U19M C1x*'
+Info: fusion de la catégorie 'M C1x*' dans la catégorie standard 'M C1x'
+Info: fusion de la catégorie 'Mix C2x*' dans la catégorie standard 'Mix C2x'
+Info: aucune catégorie standard trouvée pour 'W C1x*'
 Info: pas de fusion de la catégorie 'Open MM C4x+' dans 'Open M C4x+' puisque la catégorie senior n'existe pas
 Info: fusion de la catégorie 'Open MMix C4x+' dans 'Open Mix C4x+'
+Info: fusion de la catégorie 'Open MW C4x+' dans 'Open W C4x+'
+Info: pas de fusion de la catégorie 'Open MMix C2x' dans 'Open Mix C2x' puisque la catégorie senior n'existe pas
+Info: fusion de la catégorie 'Open MM C1x' dans 'Open M C1x'
+Attention: la fin 17:15:59.400 ne correspond pas à la fin ajustée 17:17:59.400 (CategoryResult [event=⭐ 1, eventName=- Open M C4x+, eventRank=2, crew=Seeclub Thun 2 (Marcel Wolf (c) / Peter Ferloni / Peter Mörke / Thomas Kopp / Christian Urban Schilling), crewAbbrev=THU 2, category=Open MM C4x+, start=16:30:00.0, finish=17:15:59.4, delta=10:01.2, categoryRank=null, adjTime=47:59.4, Bouée_A=12:23.0, Bouée_C=24:03.1])
+Attention: la fin 17:11:15.700 ne correspond pas à la fin ajustée 17:13:15.700 (CategoryResult [event=⭐ 3, eventName=- Open W C4x+, eventRank=2, crew=Lausanne Sports Section Aviron 21 (Denise Dupraz (c) / Magdalena Rosende / Lucia Attinger / Loyse Pahud / Silvia Uehlinger), crewAbbrev=LSA 21, category=Open MW C4x+, start=16:30:00.0, finish=17:11:15.7, delta=03:31.1, categoryRank=null, adjTime=43:15.7, Bouée_A=10:45.5, Bouée_C=20:45.5])
 
 U19W C4x+ (course 🪸 1, 10h15)
 --------------------------
@@ -207,7 +209,7 @@ W C1x 🏆🇨🇭 (course 🐟 4, 15h15)
 Open MM C4x+ (course ⭐ 1, 16h30)
 --------------------------
 1: 🥇	CAT 4	Chablais Aviron Thonon 4 «En avant le CAT» (Sylvaine Vincent (c) / Bernard Bidal / Hervé Gladkoff / Jean-Kenty Vincent / Michel Caplot)	37:58.2	
-2: 	THU 2	Seeclub Thun 2 (Marcel Wolf (c) / Peter Ferloni / Peter Mörke / Thomas Kopp / Christian Urban Schilling)	47:59.4	+08:01.2
+2: 	THU 2	Seeclub Thun 2 (Marcel Wolf (c) / Peter Ferloni / Peter Mörke / Thomas Kopp / Christian Urban Schilling)	47:59.4	+10:01.2
 
 
 Open Mix C4x+ (course ⭐ 2, 16h30)
@@ -223,7 +225,7 @@ Open Mix C4x+ (course ⭐ 2, 16h30)
 Open W C4x+ (course ⭐ 3, 16h30)
 --------------------------
 1: 🥇	CAVEV	Club d'Aviron Vevey «CAV loisirs défis» (Aude Genton (c) / Emma Dowou / Kathrin Gruber / Damaris Centanni / Sandrine Fremond)	39:44.6	
-2: 🥈	LSA 21	Lausanne Sports Section Aviron 21 (Denise Dupraz (c) / Magdalena Rosende / Lucia Attinger / Loyse Pahud / Silvia Uehlinger)	43:15.7	+01:31.1
+2: 🥈	LSA 21	Lausanne Sports Section Aviron 21 (Denise Dupraz (c) / Magdalena Rosende / Lucia Attinger / Loyse Pahud / Silvia Uehlinger)	43:15.7	+03:31.1
 3: 🥉	LSA 19	Lausanne Sports Section Aviron 19 (Diego Vila (c) / Helena Guezennec / Yannic Pannatier / Elise Jequier / Isabelle Bourqui Savoy)	47:57.9	+08:13.3
 4: 	APA 2	Audax Paradiso 2 «Audaci» (Chantal Canuti (c) / Ana Sagi-Vela / Bérenice Della Corte / Elena Figini / Monica Della Casa)	51:59.2	+12:14.6
 

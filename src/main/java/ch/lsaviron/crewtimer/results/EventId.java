@@ -23,33 +23,40 @@ public record EventId(String emoji, int id) {
 
 		// declaration order matters
 		// 2023 race IDs
-		ANEMONE("🪸"),
-		BERNARD_LHERMITE("🐚"),
-		CALAMAR("🦑"),
-		DORADE_OR_ANCHOIS("🐟"),
+		ANEMONE("🪸", 2023),
+		BERNARD_LHERMITE("🐚", 2023),
+		CALAMAR("🦑", 2023),
+		DORADE("🐟", 2023),
 		// multiple encoding found for etoile character. 2b50 and fe0f
-		ETOILE_DE_MER("\u2b50"),
-		ETOILE_DE_MER_B("\u2b50\u2b50"),
+		ETOILE_DE_MER("\u2b50", 2023),
+		ETOILE_DE_MER_B("\u2b50\u2b50", 2023),
 
 		// 2024 race IDs
-		LAMANTIN("🦭"),
-		ECREVISSE("🦞"),
-		MANCHOT("🐧"),
-		//ANCHOIS("🐟"), => duplicate from 2023 => adapting 2023 name
-		NARVAL("🦄"),
-		NARVAL_B("🦄🦄"),;
+		LAMANTIN("🦭", 2024),
+		ECREVISSE("🦞", 2024),
+		MANCHOT("🐧", 2024),
+		ANCHOIS("🐟", 2024),
+		NARVAL("🦄", 2024),
+		NARVAL_B("🦄🦄", 2024),;
 
-		private static final Map<String, Race> REVERSE = Maps
-				.uniqueIndex(Arrays.asList(Race.values()), Race::getEmoji);
+		private static final Map<String, Race> getReverse() {
+			return Maps.uniqueIndex(
+					Arrays.stream(Race.values())
+							.filter(r -> r.order == LSM.currentYear).iterator(),
+					Race::getEmoji);
+		}
 
 		private final String emoji;
 
-		private Race(final String emoji) {
+		private final int order;
+
+		private Race(final String emoji, final int order) {
 			if (StringUtil.isBlank(emoji)) {
 				throw new IllegalArgumentException(
 						"blank emoji is not allowed");
 			}
 			this.emoji = LSM.normalize(emoji);
+			this.order = order;
 		}
 
 		public static Race fromEmoji(final String emoji) {
@@ -57,7 +64,7 @@ public record EventId(String emoji, int id) {
 				// special case to allow null emoji
 				return null;
 			}
-			final Race res = REVERSE.get(LSM.normalize(emoji));
+			final Race res = getReverse().get(LSM.normalize(emoji));
 			if (res == null) {
 				// debug infos
 				System.err.println("emoji chars");
