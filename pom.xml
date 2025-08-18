@@ -6,7 +6,7 @@
 	<artifactId>bourse</artifactId>
 	<version>1.0</version>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.release>17</maven.compiler.release>
@@ -15,12 +15,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencyManagement>
-		<dependency>
-			<!-- transitive dependency of poi but to avoid security issues -->
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-lang3</artifactId>
-		    <version>3.18.0</version>
-		</dependency>
+	    <dependencies>
+		    <dependency>
+			    <!-- transitive dependency of poi but to avoid security issues -->
+		        <groupId>org.apache.commons</groupId>
+		        <artifactId>commons-lang3</artifactId>
+		        <version>3.18.0</version>
+	        </dependency>
+	    <dependencies>
 	</dependencyManagement>
 	<dependencies>
 		<dependency>
