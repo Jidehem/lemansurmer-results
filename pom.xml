@@ -14,6 +14,14 @@
 		<file.encoding>UTF-8</file.encoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<dependencyManagement>
+		<dependency>
+			<!-- transitive dependency of poi but to avoid security issues -->
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>3.18.0</version>
+		</dependency>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
